@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Alternatives</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.name.label }}
+			{{ form.name() }}
+            {% for error in form.name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+		</p>
+		<p>
+			{{ form.submit() }}
+		</p>
+
+
+
+    </form>
+<!-- Список всех заметок -->
+    <h2>Все альтернативы:</h2>
+    <ul>
+        {% for alt in all_alt %}
+            <li>{{ alt.name }}</li>
+            <form action="{{ url_for('delete_alt', alt_id=alt.id) }}" method="post" style="display:inline;">
+                <button type="submit" onclick="return confirm('Delete {{ alt.name }}?')">Delete</button>
+            </form>
+        {% endfor %}
+    </ul>
+
+    <form action="{{ url_for('save_to_json') }}" method="post">
+        <button type="submit">Save to JSON</button>
+    </form>
+{% endblock %}
