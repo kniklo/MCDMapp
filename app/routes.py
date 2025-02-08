@@ -3,7 +3,7 @@ import os
 
 from app import app
 from flask import render_template, redirect, flash, url_for
-from app.forms import AlternativeForm
+from app.forms import AlternativeForm, CriteriaForm, CriteriaWeightForm
 from app.models import db, Alternative, Criterion
 import logging
 
@@ -24,6 +24,8 @@ def index():
 
         # Показываем все заметки из БД
         all_alt = Alternative.query.all() #.query.all() — это запрос к базе, который вернет список всех объектов Alternative
+        alt = Alternative.query.get(1)
+        print(all_alt,"-----------------",alt.id, alt.name)
         return render_template('index.html', form=form, all_alt=all_alt)
 
 @app.route('/delete_alt/<int:alt_id>', methods=['POST'])
@@ -34,44 +36,61 @@ def delete_alt(alt_id):
         flash("Error!", "danger")
     return redirect(url_for('index'))
 
+@app.route('/criteria_page', methods=['GET', 'POST'])
+def criteria_page():
+    with app.app_context():
+        form = CriteriaForm()
+        weight_form = CriteriaWeightForm()
+
+        if form.validate_on_submit():
+            entered_criteria = Criterion(name=form.name.data, weight=0)
+            db.session.add(entered_criteria)
+            db.session.commit()
+            logging.info(f"Добавлен критерий: {entered_criteria.name}")
+            return redirect(url_for('criteria_page'))
+
+        # Показываем все заметки из БД
+        cr_cr = Criterion.query.all()
+        # Динамически добавляем поля для весов
+        weight_form.weights.entries = []  # Очищаем список полей
+        for criterion in cr_cr:
+            weight_form.weights.append_entry()
+            weight_form.weights[-1].weight.data = 1 / len(cr_cr)  # По умолчанию вес 1/n
+
+        print(cr_cr)
+        return render_template('criteria.html', form=form, weight_form=weight_form, cr_cr=cr_cr)
+
+@app.route('/delete_cr/<int:cr_id>', methods=['POST'])
+def delete_cr(cr_id):
+    if Criterion.delete_by_id(cr_id):
+        flash('Criterion was deleted!', "success")
+    else:
+        flash("Error!", "danger")
+    return redirect(url_for('criteria_page'))
+
 @app.route('/save_to_json', methods=['POST'])
 def save_to_json():
-    # Получаем все альтернативы из базы
-    alternatives = Alternative.query.all() #alternatives — это список объектов из базы данных
-#      [
-#     <Alternative 1>,  # Объект с name="Option A"
-#     <Alternative 2>,  # Объект с name="Option B"
-#     <Alternative 3>   # Объект с name="Option C"
-#       ]
-    # Если альтернатив нет, просто создаем пустую структуру
-    if not alternatives:
-        flash("Нет альтернатив для сохранения!", "warning")
-        return redirect(url_for('index'))
-    data = []
-    for alt in alternatives:
-        data.append(
-            {
-                alt.name: 0
-            }
-        )
-    # Автоматически задаем веса (1/n для каждой альтернативы)
-    n = len(alternatives)
-    weights = {alt.name: 1 / n for alt in alternatives}
-
-    json_data = {
-        "data": data,
-        "weights": weights,
-        "value_range": {
-            "min": 1,
-            "max": 10
-        }
+    # Получаем все альтернативы и критерии из базы
+    alternatives = Alternative.query.all()
+    criteria = Criterion.query.all()
+    weight_form = CriteriaWeightForm()
+    for i, criterion in enumerate(criteria):
+        criterion.weight = weight_form.weights[i].weight.data
+    db.session.commit()
+    if not alternatives or not criteria:
+        flash("Нет данных для сохранения!", "warning")
+    # Создаем структуру данных
+    data = {
+        "alternatives": [alt.name for alt in alternatives],
+        "criteria": [{"name": cr.name, "weight": cr.weight} for cr in criteria]
     }
+
     # Путь к файлу JSON
-    json_path = os.path.join(os.getcwd(), 'input.json')
+    json_path = os.path.join(os.getcwd(), 'data.json')
+
     # Записываем в файл
     with open(json_path, 'w', encoding='utf-8') as f:
-        json.dump(json_data, f, indent=4, ensure_ascii=False)
+        json.dump(data, f, indent=4, ensure_ascii=False)
 
-    flash("Your data successfully safe to input.json!", "success")
-    return redirect(url_for('index'))
-
+    flash("Данные успешно сохранены в data.json!", "success")
+    return redirect(url_for('criteria_page'))

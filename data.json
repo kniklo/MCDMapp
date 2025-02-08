@@ -1,0 +1,16 @@
+{
+    "alternatives": [
+        "Way1",
+        "Way2"
+    ],
+    "criteria": [
+        {
+            "name": "criteria1",
+            "weight": 0.4
+        },
+        {
+            "name": "criterial2",
+            "weight": 0.5
+        }
+    ]
+}

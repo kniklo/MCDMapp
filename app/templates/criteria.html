@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Criteria</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.name.label }}
+			{{ form.name() }}
+            {% for error in form.name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+		</p>
+		<p>
+			{{ form.submit() }}
+		</p>
+    </form>
+
+ Список всех заметок
+    <h2>Добавленные критерии:</h2>
+    <form method="POST" action="{{ url_for('save_to_json') }}">
+        {{ weight_form.hidden_tag() }}
+        <table border="0">
+            {% for cr in cr_cr %}
+                <tr>
+                <td>{{ cr.name }}</td>
+                <td>{{ weight_form.weights[loop.index0].weight(size=5) }}</td>
+                <td><form action="{{ url_for('delete_cr', cr_id=cr.id) }}" method="post" style="display:inline;">
+                            <button type="submit" onclick="return confirm('Delete {{ cr.name }}?')">Delete</button>
+                        </form></td>
+                </tr>
+            {% endfor %}
+        </table>
+        <form action="{{ url_for('index') }}" method="post">
+        <button type="submit">Prev</button>
+        </form>
+        {{ weight_form.submit() }}
+    </form>
+
+{% endblock %}
