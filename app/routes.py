@@ -1,6 +1,3 @@
-import json
-import os
-
 from sqlalchemy import func
 from app import app
 from flask import render_template, redirect, flash, url_for, request, session, jsonify
@@ -8,7 +5,11 @@ from app.forms import ExpertForm, TaskForm, ComparisonMatrixForm, MatrixCellForm
 from app.models import db, Alternative, Criterion, Expert, Task, Analysis, AnalysisAlternative, AnalysisCriterion,AlternativeEvaluation
 import logging
 
+from app.services.utils.matrices import MatrixHelper
+from app.services import MCDMService
+
 logging.basicConfig(level=logging.INFO)
+
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
@@ -28,10 +29,12 @@ def index():
         selected_expert = session.get('selected_expert')
         return render_template('expert.html', form=form, all_expert=all_expert, selected_expert=selected_expert)
 
+
 @app.route('/select_expert/<int:expert_id>', methods=['POST'])
 def select_expert(expert_id):
     session['selected_expert'] = expert_id
     return redirect(url_for('index'))
+
 
 @app.route('/task_page', methods=['GET', 'POST'])
 def task_page():
@@ -50,10 +53,12 @@ def task_page():
         selected_task = session.get('selected_task')
         return render_template('task.html', form=form, all_task=all_task, selected_task=selected_task)
 
+
 @app.route('/select_task/<int:task_id>', methods=['POST'])
 def select_task(task_id):
     session['selected_task'] = task_id
     return redirect(url_for('task_page'))
+
 
 @app.route('/leave_task_page', methods=['POST'])
 def leave_task_page():
@@ -97,6 +102,7 @@ def leave_task_page():
 
     return redirect(url_for('alternative_page'))
 
+
 @app.route('/alternative_page', methods=['GET', 'POST'])
 def alternative_page():
     with app.app_context():
@@ -135,6 +141,7 @@ def add_alternative():
 
     return jsonify({'success': True, 'id': new_alt.id})
 
+
 @app.route('/alternative_page/add-analysis_alternative', methods=['POST'])
 def add_analysis_alternative():
     data = request.get_json()
@@ -149,6 +156,7 @@ def add_analysis_alternative():
 
     return jsonify({'success': True, 'id': new_alt.id})
 
+
 @app.route('/delete_alt/<int:alt_id>', methods=['POST'])
 def delete_alt(alt_id):
     AnalysisAlternative.delete_by_id(alt_id)
@@ -160,6 +168,7 @@ def criterion_page():
     cr_cr = AnalysisCriterion.get_by_analysis_id(session.get('selected_analysis'))
     task = Task.get_task(session.get('selected_task'))
     return render_template('criterion.html', cr_cr=cr_cr, fl_new_task=task.fl_new)
+
 
 @app.route('/criterion_page/search')
 def criterion_page_search():
@@ -175,6 +184,7 @@ def criterion_page_search():
 
     return jsonify([])
 
+
 @app.route('/criterion_page/add-criterion', methods=['POST'])
 def add_criterion():
     data = request.get_json()
@@ -189,6 +199,7 @@ def add_criterion():
 
     return jsonify({'success': True, 'id': new_cr.id})
 
+
 @app.route('/criterion_page/add-analysis_criterion', methods=['POST'])
 def add_analysis_criterion():
     data = request.get_json()
@@ -202,6 +213,7 @@ def add_analysis_criterion():
     db.session.commit()
 
     return jsonify({'success': True, 'id': new_cr.id})
+
 
 @app.route('/update_criterion_value', methods=['POST'])
 def update_criterion_value():
@@ -227,10 +239,12 @@ def update_criterion_value():
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+
 @app.route('/delete_cr/<int:cr_id>', methods=['POST'])
 def delete_cr(cr_id):
     AnalysisCriterion.delete_by_id(cr_id)
     return redirect(url_for('criterion_page'))
+
 
 @app.route('/leave_criterion_page', methods=['GET', 'POST'])
 def leave_criterion_page():
@@ -244,17 +258,21 @@ def leave_criterion_page():
     db.session.commit()
     return redirect(url_for('alternative_evaluation'))
 
+
 @app.route('/alternative_evaluation', methods=['GET', 'POST'])
 def alternative_evaluation():
     all_alt = AnalysisAlternative.get_by_analysis_id(session.get('selected_analysis'))
     cr_cr = AnalysisCriterion.get_by_analysis_id(session.get('selected_analysis'))
-    return render_template('alternative_evaluation.html', all_alt=all_alt, cr_cr=cr_cr)
+    analysis_id = session.get('selected_analysis')
+    return render_template('alternative_evaluation.html', all_alt=all_alt, cr_cr=cr_cr, analysis_id=analysis_id)
+
 
 @app.route('/get_alternative_evaluation_criterions')
 def get_evaluations():
     alt_id = request.args.get('alt_id')
     evaluations = AlternativeEvaluation.get_by_alternative_id(alt_id)
     return jsonify(evaluations)
+
 
 @app.route('/update_alternative_evaluation', methods=['POST'])
 def update_evaluation():
@@ -278,41 +296,47 @@ def update_evaluation():
         # Если запись не найдена, возвращаем ошибку
         return jsonify({'success': False, 'error': 'Запись не найдена'}), 404
 
-@app.route('/calculate_page', methods=['GET', 'POST'])
-def calculate_page():
-    return redirect(url_for('alternative_evaluation'))
 
-@app.route('/comparison_matrix', methods=['GET', 'POST'])
-def comparison_matrix():
-    data = request.form
+@app.route('/comparison_matrix/<int:analysis_id>')
+def comparison_matrix(analysis_id):
+    try:
+        # Получаем сам анализ и связанные данные
+        analysis = Analysis.query.filter_by(id=analysis_id).first_or_404()
+        analysis_name = analysis.task.name
 
-    # Создаем словарь для хранения значений важности
-    importances = {}
-    criteries = []
-    # Проходим по всем ключам формы
-    for key in data:
-        if key.startswith('importance_'):
-            cr_id = key.split('_')[1]  # Получаем ID критерия
-            cr_name = Criterion.get_criterion_name(int(cr_id))
-            criteries.append(cr_name)
-            importance = int(data[key])  # Получаем значение важности
-            importances[cr_id] = importance
-            Criterion.update_criterion_importance(int(cr_id), int(importance))
-    form = initialize_matrix(importances)
+        # Получаем матрицу сравнений критериев
+        criteria_matrix = MatrixHelper.build_criteria_comparison_matrix(analysis_id)
 
-    return render_template('comparison_matrix.html', form=form, items=criteries)
+        # Получаем информацию о критериях для подписей
+        criteria = AnalysisCriterion.query.filter_by(analysis_id=analysis_id) \
+            .join(Criterion) \
+            .order_by(Criterion.id) \
+            .with_entities(Criterion.name, Criterion.id) \
+            .all()
+
+        # Проверка согласованности (опционально)
+        consistency_ratio = MatrixHelper.calculate_consistency_ratio(criteria_matrix)
+
+        return render_template(
+            'comparison_matrix.html',
+            matrix=criteria_matrix,
+            criteria=criteria,
+            analysis_id=analysis_id,
+            analysis_name=analysis_name,
+            consistency_ratio=consistency_ratio
+        )
+
+    except ValueError as e:
+        flash(str(e), 'danger')
+        return redirect(url_for('alternative_evaluation'))
 
 
-def initialize_matrix(importances):
-    print(importances)
-    form = ComparisonMatrixForm()
-    form.matrix = []
-    list_imp = [int(v) for v in importances.values()]
-    for i in range(len(list_imp)):
-        row = []
-        for j in range(len(list_imp)):
-            value = round(list_imp[j] / list_imp[i], 2)
-            row.append(MatrixCellForm(value=value))
-        form.matrix.append(row)
-    return form
-
+@app.route('/calculate/<int:analysis_id>')
+def calculate(analysis_id):
+    method = request.args.get('method', 'fahp')  # или 'ahp'
+    service = MCDMService(method=method)
+    try:
+        result = service.calculate(analysis_id)
+        return jsonify({'status': 'success', 'data': result})
+    except ValueError as e:
+        return jsonify({'status': 'error', 'message': str(e)}), 400

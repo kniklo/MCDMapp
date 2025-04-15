@@ -1,3 +1,4 @@
+#app/models.py
 import sqlalchemy as sa
 import sqlalchemy.orm as so
 from fsspec.registry import default
@@ -14,6 +15,7 @@ class Alternative(db.Model):
 
     # Связи
     analysis_alternatives = db.relationship('AnalysisAlternative', backref='alternative', lazy=True)
+
 
 # Модель для таблицы `analysis`
 class Analysis(db.Model):
@@ -69,6 +71,7 @@ class AnalysisAlternative(db.Model):
             return True
         return False
 
+
 # Модель для таблицы `analysis_criterion`
 class AnalysisCriterion(db.Model):
     __tablename__ = 'analysis_criterion'
@@ -105,6 +108,35 @@ class AnalysisCriterion(db.Model):
             return True
         return False
 
+    # @classmethod
+    # def build_comparison_matrix(cls, analysis_id: int) -> list[list[float]]:
+    #     """
+    #     Строит матрицу парных сравнений на основе subj_value критериев.
+    #     Возвращает квадратную матрицу NxN, где N - число критериев.
+    #     """
+    #     # Получаем все критерии анализа, отсортированные по ID
+    #     criteria = cls.query.filter_by(analysis_id=analysis_id) \
+    #         .order_by(cls.criterion_id) \
+    #         .all()
+    #
+    #     # Проверка входных данных
+    #     if not criteria:
+    #         raise ValueError("No criteria found for this analysis")
+    #     if any(c.subj_value <= 0 for c in criteria):
+    #         raise ValueError("All subj_value must be positive")
+    #
+    #     # Создаем матрицу
+    #     size = len(criteria)
+    #     matrix = np.ones((size, size), dtype=np.float64)
+    #
+    #     for i in range(size):
+    #         for j in range(size):
+    #             if i != j:
+    #                 matrix[i][j] = criteria[j].subj_value / criteria[i].subj_value
+    #
+    #     return matrix.tolist()
+
+
 # Модель для таблицы `alternative_evaluation`
 class AlternativeEvaluation(db.Model):
     __tablename__ = 'alternative_evaluation'
@@ -134,6 +166,7 @@ class AlternativeEvaluation(db.Model):
             for result in results]
         return res
 
+
 # Модель для таблицы `criterion`
 class Criterion(db.Model):
     __tablename__ = 'criterion'
@@ -143,6 +176,7 @@ class Criterion(db.Model):
     # Связи
     analysis_criterion = db.relationship('AnalysisCriterion', backref='criterion', lazy=True)
 
+
 # Модель для таблицы `expert`
 class Expert(db.Model):
     __tablename__ = 'expert'
@@ -151,6 +185,7 @@ class Expert(db.Model):
 
     # Связи
     analyses = db.relationship('Analysis', backref='expert', lazy=True)
+
 
 # Модель для таблицы `task`
 class Task(db.Model):
@@ -177,6 +212,7 @@ class Task(db.Model):
             db.session.commit()
         return task if task else None
 
+
 # Модель для таблицы `task_data`
 class TaskData(db.Model):
     __tablename__ = 'task_data'
@@ -185,75 +221,3 @@ class TaskData(db.Model):
     criterion_id = db.Column(db.Integer, db.ForeignKey('criterion.id'), nullable=False)
     alternative_id = db.Column(db.Integer, db.ForeignKey('alternative.id'), nullable=False)
     value = db.Column(db.String(60), nullable=False)
-
-
-# class Analyse(db.Model):
-#     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-#     expert_id = db.Column(db.Integer, db.ForeignKey('expert.id'), nullable=False)
-#     task_id = db.Column(db.Integer, db.ForeignKey('task.id'), nullable=False)
-#
-#     @classmethod
-#     def delete_by_id(cls, an_id):
-#         analyse = cls.query.get(an_id)
-#         if analyse:
-#             db.session.delete(analyse)
-#             db.session.commit()
-#             return True
-#         return False
-#
-#
-# class _Alternative(db.Model):
-#     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-#     name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
-#     analyse_id = db.Column(db.Integer, db.ForeignKey('analyse.id'), nullable=False)
-#
-#     analyse = db.relationship('Analyse', back_populates='alternatives')
-#
-#     @classmethod
-#     def delete_by_id(cls, alt_id):
-#         alternative = cls.query.get(alt_id)
-#         if alternative:
-#             db.session.delete(alternative)
-#             db.session.commit()
-#             return True
-#         return False
-#
-#     @classmethod
-#     def get_by_analyse_id(cls, analyse_id):
-#         return cls.query.filter_by(analyse_id=analyse_id).all()
-#
-#
-# class _Criterion(db.Model):
-#     id: so.Mapped[int] = so.mapped_column(primary_key=True)
-#     name: so.Mapped[str] = so.mapped_column(sa.String(64), index=True, unique=True)
-#     subj_value: so.Mapped[Optional[int]] = so.mapped_column(default=1)
-#     analyse_id = db.Column(db.Integer, db.ForeignKey('analyse.id'), nullable=False)
-#
-#     analyse = db.relationship('Analyse', back_populates='criterion')
-#
-#     @classmethod
-#     def delete_by_id(cls, cr_id):
-#         cr = cls.query.get(cr_id)
-#         if cr:
-#             db.session.delete(cr)
-#             db.session.commit()
-#             return True
-#         return False
-#
-#     @classmethod
-#     def get_by_analyse_id(cls, analyse_id):
-#         return cls.query.filter_by(analyse_id=analyse_id).all()
-#
-#     @classmethod
-#     def get_criterion_name(cls, criterion_id):
-#         criterion = Criterion.query.get(criterion_id)
-#         return criterion.name if criterion else None
-#
-#     @classmethod
-#     def update_criterion_importance(cls, criterion_id, new_importance):
-#         criterion = Criterion.query.get(criterion_id)
-#         if criterion:
-#             criterion.subj_value = new_importance
-#             db.session.commit()
-#             return True
-#         return False

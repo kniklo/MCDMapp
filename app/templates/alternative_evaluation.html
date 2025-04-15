@@ -44,7 +44,15 @@
     <div class="bottom-section">
         <div class="buttons-container">
             <a href="{{ url_for('criterion_page') }}"><button type="button">К критериям</button></a>
-            <a href="{{ url_for('calculate_page') }}"><button type="button">Рассчитать</button></a>
+            {% if analysis_id %}
+                <a href="{{ url_for('comparison_matrix', analysis_id=analysis_id) }}">
+                    <button type="button" class="btn btn-primary">Показать матрицу</button>
+                </a>
+            {% else %}
+                <button class="btn btn-secondary" disabled title="Не выбран анализ">
+                    Показать матрицу
+                </button>
+{% endif %}
         </div>
     </div>
 </div>
