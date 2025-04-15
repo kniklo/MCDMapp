@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="top-section">
+        <h1>Критерии</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Поиск..."
+                {% if fl_new_task == 0 %} disabled {% endif %}>
+            <button id="addButton"
+                {% if fl_new_task == 0 %} disabled {% endif %}>Добавить</button>
+        </div>
+        <div id="suggestions"></div>
+    </div>
+
+    <div class="bottom-section">
+        <h2>Выбранные критерии для анализа:</h2>
+        <table id="criterion_table" border="1">
+            <tr>
+                <th>Критерий</th>
+                <th>Важность (от 1 до 10)</th>
+                <th></th>
+            </tr>
+            {% for cr in cr_cr %}  <!-- Цикл по всем критериям -->
+                <tr>
+                    <td>{{ cr.name }}</td>  <!-- Название критерия -->
+                    <td>
+                        <select name="importance_{{ cr.id }}" onchange="updateCriterionValue({{ cr.id }}, this.value)">
+                            {% for i in range(1, 11) %}
+                                <option value="{{ i }}" {% if i == cr.subj_value %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        {% if fl_new_task == 0 %}
+                            <div class="disabled-form">
+                                <span class="disabled-text">Delete</span>
+                            </div>
+                        {% else %}
+                            <form action="{{ url_for('delete_cr', cr_id=cr.id) }}" method="post" style="display:inline;">
+                                <button type="submit" onclick="return confirm('Delete {{ cr.name }}?')">Delete</button>
+                            </form>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        <div class="buttons-container">
+            <a href="{{ url_for('alternative_page') }}"><button type="button">К альтернативам</button></a>
+            <dialog id="confirmDialog">
+                <p class="dialog-message">Вы уверены?<br>
+                    После перехода наборы альтернатив и критериев нельзя будет изменить.</p>
+                <div class="dialog_buttons">
+                    <button id="confirmYes" class="dialog_button">Да</button>
+                    <button id="confirmNo" class="dialog_button">Нет</button>
+                </div>
+            </dialog>
+            <button id="leaveButton" type="button"  data-fl-new-task="{{ fl_new_task }}">К ранжированию альтернатив по критериям</button>
+        </div>
+    </div>
+</div>
+<script>
+const searchInput = document.getElementById('searchInput');
+const addButton = document.getElementById('addButton');
+const suggestions = document.getElementById('suggestions');
+const criterionTable = document.getElementById('criterion_table');
+
+const dialog = document.getElementById('confirmDialog');
+const leaveButton = document.getElementById('leaveButton');
+const flNewTask = leaveButton.dataset.flNewTask;
+const confirmYes = document.getElementById('confirmYes');
+const confirmNo = document.getElementById('confirmNo');
+
+// Функция мигания строки
+async function blinkRow(row) {
+    const originalColor = row.style.backgroundColor;
+    const blinkCount = 2;
+    const blinkDuration = 100; // миллисекунд
+
+    for (let i = 0; i < blinkCount; i++) {
+        row.style.backgroundColor = 'red';
+        await sleep(blinkDuration);
+        row.style.backgroundColor = originalColor;
+        await sleep(blinkDuration);
+    }
+    row.style.backgroundColor = '';
+}
+
+// Вспомогательная функция задержки
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// Проверка на дублирование
+function isDuplicate(name) {
+    const rows = criterionTable.querySelectorAll('td');
+    return Array.from(rows).some(cell => cell.textContent === name);
+}
+
+function confirmAction() {
+    const confirmed = confirm('Вы уверены, что хотите перейти к ранжированию альтернатив по критериям?');
+    return confirmed;
+}
+
+async function updateCriterionValue(criterionId, value) {
+    try {
+        const response = await fetch('/update_criterion_value', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                criterion_id: criterionId,
+                subj_value: parseFloat(value)  // Преобразуем значение в число
+            })
+        });
+
+        if (response.ok) {
+            console.log('Значение успешно обновлено');
+        } else {
+            console.error('Ошибка при обновлении значения');
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+    }
+}
+
+// Сохранение в базу данных
+async function saveToDatabase(id, name) {
+    if (isDuplicate(name)) {
+        const existingCell = Array.from(criterionTable.querySelectorAll('td'))
+            .find(cell => cell.textContent === name);
+        const rowToBlink = existingCell.closest('tr');
+        await blinkRow(rowToBlink);
+        return;
+    }
+
+    try {
+        const response = await fetch('/criterion_page/add-analysis_criterion', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id: id })
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            // После успешного сохранения добавляем в таблицу
+            const newRow = document.createElement('tr');
+            // Ячейка с названием критерия
+            const nameCell = document.createElement('td');
+            nameCell.textContent = name;
+            // Ячейка с селектом важности
+            const importanceCell = document.createElement('td');
+            const select = document.createElement('select');
+            select.name = `importance_${data.id}`;
+            select.onchange = function() {
+                updateCriterionValue(data.id, this.value);
+            };
+            // Заполняем селект опциями
+            for (let i = 1; i <= 10; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = i;
+
+                // Устанавливаем атрибут selected, если значение совпадает с subj_value
+                if (i === data.subj_value) {
+                    option.selected = true;
+                }
+
+                select.appendChild(option);
+            }
+            importanceCell.appendChild(select);
+            // Ячейка с кнопкой удаления
+            const deleteCell = document.createElement('td');
+            const deleteForm = document.createElement('form');
+            deleteForm.method = "post";
+            deleteForm.style.display = "inline";
+            deleteForm.action = `/delete_cr/${data.id}`;
+            const deleteButton = document.createElement('button');
+            deleteButton.type = "submit";
+            deleteButton.textContent = "Delete";
+            deleteButton.onclick = function() {
+                return confirm(`Delete ${name}?`);
+            };
+            deleteForm.appendChild(deleteButton);
+            deleteCell.appendChild(deleteForm);
+
+            newRow.appendChild(nameCell);
+            newRow.appendChild(importanceCell);
+            newRow.appendChild(deleteCell);
+            criterionTable.appendChild(newRow);
+
+            // Очищаем поле поиска
+            searchInput.value = '';
+            suggestions.innerHTML = '';
+        } else {
+            alert('Ошибка при сохранении критерия');
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при сохранении');
+    }
+}
+
+leaveButton.addEventListener('click', function(e) {
+    if (flNewTask == 1) {
+        dialog.showModal();
+    }
+    else {
+        window.location.href = "{{ url_for('alternative_evaluation') }}";
+    }
+});
+
+confirmYes.addEventListener('click', function() {
+    dialog.close();
+    window.location.href = "{{ url_for('leave_criterion_page') }}";
+});
+
+confirmNo.addEventListener('click', function() {
+    dialog.close();
+});
+
+dialog.addEventListener('cancel', function(e) {
+    e.preventDefault();
+});
+
+// Обработчик кнопки "Добавить"
+addButton.addEventListener('click', async function() {
+    const name = searchInput.value.trim();
+
+    if (!name) {
+        alert('Введите название критерия');
+        return;
+    }
+
+    const response = await fetch('/criterion_page/add-criterion', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ name: name })
+    });
+
+    if (response.ok) {
+        const data = await response.json();
+        saveToDatabase(data.id, name);
+    }
+});
+
+// Обработчик ввода
+searchInput.addEventListener('input', async function() {
+    const query = this.value;
+
+    if (query.length >= 1) { // Начинаем поиск при 1 символе
+        try {
+            const response = await fetch(`/criterion_page/search?q=${encodeURIComponent(query)}`);
+            const data = await response.json();
+
+            // Очищаем предыдущий список
+            suggestions.innerHTML = '';
+
+            // Создаем новые элементы
+            if (data.length > 0) {
+                data.forEach(item => {
+                    const suggestion = document.createElement('div');
+                    suggestion.classList.add('suggestion');
+                    suggestion.dataset.id = item.id;
+                    suggestion.textContent = item.name;
+                    suggestions.appendChild(suggestion);
+                });
+            } else {
+                suggestions.textContent = 'Ничего не найдено';
+            }
+        } catch (error) {
+            console.error('Ошибка при поиске:', error);
+        }
+    } else {
+        suggestions.innerHTML = '';
+    }
+});
+
+// Обработчик клика на элементы списка (добавляем один раз)
+suggestions.addEventListener('click', function(event) {
+    if (event.target.classList.contains('suggestion')) {
+        const id = event.target.dataset.id;
+        const name = event.target.textContent;
+        saveToDatabase(id, name);
+    }
+});
+</script>
+
+{% endblock %}

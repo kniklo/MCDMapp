@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="top-section">
+    <h1>МАТРИЦА</h1>
+</div>
+
+    <div class="bottom-section">
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th></th>
+                    {% for item in items %}
+                        <th>{{ item }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for i in range(items|length) %}
+                    <tr>
+                        <th>{{ items[i] }}</th>
+                        {% for j in range(items|length) %}
+                            <td>
+                                <input type="number" step="0.01" name="matrix-{{ i }}-{{ j }}" value="{{ form.matrix[i][j].value.data }}" required>
+                            </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="buttons-container">
+            <a href="{{ url_for('criterion_page') }}"><button type="button">К критериям</button></a>
+            <button type="submit">Сохранить матрицу</button>
+        </div>
+
+    </form>
+        </div>
+</div>
+{% endblock %}

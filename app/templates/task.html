@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="top-section">
+    <h1>Задание</h1>
+    <form action="" method="post" novalidate>
+        {{ form.hidden_tag() }}
+        <p>
+            {{ form.name.label }}
+			{{ form.name() }}
+            {{ form.description.label }}
+            {{ form.description() }}
+            {% for error in form.name.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+		</p>
+		<p>
+			{{ form.submit() }}
+		</p>
+    </form>
+    </div>
+
+    <div class="bottom-section">
+    <h2>Все задания:</h2>
+    <table border="1">
+        <tr>
+            <th>Название</th>
+            <th>Описание</th>
+            <th></th>
+        </tr>
+        {% for task in all_task %}
+            <tr {% if task.id == selected_task %}style="background-color: lightgreen;"{% endif %}>
+                <td>{{ task.name }}</td>
+                <td>{{ task.description }}</td>
+                <td>
+                    <form action="{{ url_for('select_task', task_id=task.id) }}" method="post" style="display:inline;">
+                        <button type="submit">Выбрать</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+        <div class="buttons-container">
+            <a href="{{ url_for('index') }}"><button type="button">К экспертам</button></a>
+            <form action="{{ url_for('leave_task_page') }}" method="post">
+                <button type="submit" {{ 'disabled' if selected_task == 0 else '' }}
+                    title="{{ 'Выберите задачу' if selected_task == 0 else '' }}">
+                    К альтернативам
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block additional_content %}
+{% endblock %}

@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="top-section">
+        <h1>Альтернативы</h1>
+    </div>
+
+    <div class="bottom-section">
+        <table border="1" id="alternatives_table">
+            <tr>
+                <th>Альтернатива</th>
+            </tr>
+            {% for alt in all_alt %}
+            <tr data-id="{{ alt.id }}">
+                <td>{{ alt.name }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="top-section">
+        <h1>Критерии</h1>
+    </div>
+    <div class="bottom-section">
+        <table id="criterion_table" border="1">
+            <tr>
+                <th>Критерий</th>
+                <th>Важность (от 1 до 10)</th>
+            </tr>
+            {% for cr in cr_cr %}  <!-- Цикл по всем критериям -->
+                <tr data-id="{{ cr.id }}">
+                    <td>{{ cr.name }}</td>  <!-- Название критерия -->
+                    <td>
+                        <select>
+                            {% for i in range(1, 11) %}
+                                <option value="{{ i }}">{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="bottom-section">
+        <div class="buttons-container">
+            <a href="{{ url_for('criterion_page') }}"><button type="button">К критериям</button></a>
+            <a href="{{ url_for('calculate_page') }}"><button type="button">Рассчитать</button></a>
+        </div>
+    </div>
+</div>
+<script>
+const alternativesTable = document.getElementById('alternatives_table');
+const criterionTable = document.getElementById('criterion_table');
+
+// Функция для обновления таблицы criterion_table
+function updateCriterionTable(evaluations) {
+    // Проходим по всем строкам таблицы критериев (игнорируем заголовок)
+    Array.from(criterionTable.querySelectorAll('tr')).forEach((row, index) => {
+        if (index === 0) return; // Пропускаем заголовок
+
+        // Получаем id критерия из data-id строки
+        const criterionId = parseInt(row.dataset.id, 10);
+
+        // Ищем оценку для текущего критерия в данных, полученных от сервера
+        const evaluation = evaluations.find(e => e.criterion_id === criterionId);
+
+        // Находим <select> элемент в текущей строке
+        const selectElement = row.querySelector('select');
+
+        // Если оценка найдена, устанавливаем соответствующее значение в <select>
+        if (evaluation) {
+            selectElement.value = evaluation.subj_value;
+        }
+
+        // Добавляем обработчик события change для <select>
+        selectElement.addEventListener('change', function (event) {
+            const newValue = parseInt(event.target.value, 10); // Новое значение из <select>
+            const altId = alternativesTable.querySelector('.selectedrow_intable').dataset.id; // ID выбранной альтернативы
+
+            // Отправляем запрос на сервер для обновления subj_value
+            fetch('/update_alternative_evaluation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    alt_id: altId,
+                    criterion_id: criterionId,
+                    subj_value: newValue
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Значение успешно обновлено в базе данных');
+                } else {
+                    console.error('Ошибка при обновлении значения');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+            });
+        });
+    });
+}
+
+alternativesTable.addEventListener('click', function (event) {
+    const row = event.target.closest('tr');
+    if (row && row !== alternativesTable.querySelector('tr:first-child')) { // Игнорируем заголовок
+        // Убираем выделение у всех строк
+        Array.from(alternativesTable.querySelectorAll('tr')).forEach(r => {
+            r.classList.remove('selectedrow_intable');
+        });
+
+        // Выделяем выбранную строку
+        row.classList.add('selectedrow_intable');
+
+        // Получаем id альтернативы
+        const altId = row.dataset.id;
+
+        // Запрашиваем данные с сервера
+        fetch(`/get_alternative_evaluation_criterions?alt_id=${altId}`)
+            .then(response => response.json())
+            .then(data => {
+                // Обновляем таблицу criterion_table
+                updateCriterionTable(data);
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+            });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Находим первую строку в таблице alternatives_table (игнорируем заголовок)
+    const firstRow = alternativesTable.querySelector('tr:nth-child(2)');
+
+    // Если первая строка существует, вызываем событие клика на неё
+    if (firstRow) {
+        firstRow.click();
+    }
+});
+
+</script>
+
+{% endblock %}
+{% block additional_content %}
+{% endblock %}

@@ -1,0 +1,78 @@
+<!Doctype html>
+<html>
+    <head>
+        {% if title %}
+        <title>{{ title }} - DmApp</title>
+        {% else %}
+        <title>DmApp</title>
+        {% endif %}
+        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+        <style>
+            body {
+             display: flex;
+             justify-content: flex-start;
+             align-items: center;
+             min-height: 100vh;
+             margin: 0;
+             }
+
+            .container {
+             border: 1px solid #ccc;
+             border-radius: 10px;
+             padding: 20px;
+             background: white;
+             box-shadow: 0 0 10px rgba(0,0,0,0.1);
+             width: 50%;
+             max-width: 800px;
+             min-width: 300px;
+             display: flex;
+             flex-direction: column;
+            }
+
+        .top-section, .bottom-section {
+            padding: 10px;
+        }
+
+        .top-section {
+            border-bottom: 1px solid #ccc;
+            margin-bottom: 20px;
+        }
+
+        ul {
+            list-style-type: disc;
+            padding-left: 20px;
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .buttons-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00aa7b;
+            color: white;
+        }
+    </style>
+    </head>
+    <body>
+        <hr>
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <ul>
+            {% for message in messages %}
+            <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+        {% endwith %}
+        {% block content %}{% endblock %}
+        <hr>
+        {% block additional_content %}{% endblock %}
+
+  </body>
+</html>
