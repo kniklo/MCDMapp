@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="top-section">
+        <h1>Criteria comparison</h1>
+        <h3>How impotant is each criterion for your decision ?</h3>
+        <div class="numbers-container">
+            {% for number in range(1, 11) %}
+                <div class="number-box">{{ number }}</div>
+            {% endfor %}
+        </div>
+        <div style="display: flex; font-size: 18px;">
+            Where: 1 = Who's there? and 10 = Cannot compromise on this!
+        </div>
+    </div>
+
+    <div class="bottom-section">
+        <table id="criterion_table" border="1">
+            <tr>
+                <th>Criteria</th>
+                <th>Importance</th>
+            </tr>
+            {% for cr in cr_cr %}
+                <tr>
+                    <td>{{ cr.name }}</td>
+                    <td>
+                        <select name="importance_{{ cr.id }}" onchange="updateCriterionValue({{ cr.id }}, this.value)">
+                            {% for i in range(1, 11) %}
+                                <option value="{{ i }}" {% if i == cr.subj_value %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+
+        <div class="buttons-container">
+            <form action="{{ url_for('index') }}" method="post">
+                <button type="submit">Back to main</button>
+            </form>
+           <form action="{{ url_for('alternative_evaluation') }}" method="post">
+                <button type="submit">Next</button>
+            </form>
+        </div>
+    </div>
+</div>
+<style>
+    .numbers-container {
+        display: flex;
+        gap: 10px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .number-box {
+        background-color: #3498db;
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 18px;
+        font-weight: bold;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+</style>
+<script>
+async function updateCriterionValue(criterionId, value) {
+    try {
+        const response = await fetch('/update_criterion_value', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                criterion_id: criterionId,
+                subj_value: parseFloat(value)  // Преобразуем значение в число
+            })
+        });
+
+        if (response.ok) {
+            console.log('Значение успешно обновлено');
+        } else {
+            console.error('Ошибка при обновлении значения');
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+    }
+}
+
+</script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Матрица парных сравнений критериев</h2>
+    <p class="text-muted">Анализ ID: {{ analysis_id }}</p>
+    <p class="text-muted">Анализ : {{ analysis_name }}</p>
+
+    {% if consistency_ratio > 0.1 %}
+    <div class="alert alert-warning">
+        Внимание! Коэффициент согласованности (CR = {{ "%.3f"|format(consistency_ratio) }}) > 0.1.
+        Рекомендуется пересмотреть оценки.
+    </div>
+    {% else %}
+    <div class="alert alert-success">
+        Коэффициент согласованности: {{ "%.3f"|format(consistency_ratio) }} (приемлемо)
+    </div>
+    {% endif %}
+
+    <div class="table-responsive">
+        <table class="table table-bordered matrix-table">
+            <thead>
+                <tr>
+                    <th>Критерии</th>
+                    {% for criterion in criteria %}
+                    <th title="ID: {{ criterion.id }}">{{ criterion.name }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in matrix %}
+                <tr>
+                    <th title="ID: {{ criteria[loop.index0].id }}">
+                        {{ criteria[loop.index0].name }}
+                    </th>
+                    {% for value in row %}
+                    <td class="text-center {% if value == 1 %}bg-light{% elif value > 1 %}table-success{% else %}table-warning{% endif %}">
+                        {{ "%.2f"|format(value) }}
+                    </td>
+                    {% endfor %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <a href="{{ url_for('alternative_evaluation') }}" class="btn btn-primary">
+        <button type="button">Назад</button>
+    </a>
+</div>
+
+
+<style>
+.matrix-table {
+    font-size: 14px;
+}
+.matrix-table th {
+    background-color: #f8f9fa;
+    min-width: 150px;
+}
+.matrix-table td {
+    min-width: 80px;
+}
+.table-success {
+    background-color: #d4edda !important;
+}
+.table-warning {
+    background-color: #fff3cd !important;
+}
+</style>
+{% endblock %}

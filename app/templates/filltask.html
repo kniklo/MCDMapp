@@ -1,0 +1,376 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="top-section">
+        <h1>Задача</h1>
+        <div style="display: flex; align-items: flex-start; gap: 20px;">
+        <form method="POST" action="{{ url_for('update_task', task_id=task.id) }}">
+            <div style="margin-bottom: 10px;">
+                <label for="task_name">Название:</label>
+                <input type="text" id="task_name" name="task_name" value="{{ task.name }}" style="padding: 5px; width: 300px;">
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label for="task_description">Описание:</label>
+                <textarea id="task_description" name="task_description" style="padding: 5px; width: 300px; height: 100px;">{{ task.description }}</textarea>
+            </div>
+            <button type="submit" style="padding: 5px 15px; background-color: #4CAF50; color: white; border: none; border-radius: 4px;">
+                Сохранить изменения
+            </button>
+        </form>
+        </div>
+    </div>
+    <!-- Секция альтернатив -->
+    <div class="bottom-section">
+        <h1>Альтернативы</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput_alt" placeholder="Поиск..." class="search-input">
+            <button id="addButton_alt" class="btn btn-primary">Добавить</button>
+        </div>
+        <div id="suggestions_alt" class="suggestions-container"></div>
+    </div>
+
+    <div class="bottom-section">
+        <h2>Выбранные альтернативы для анализа:</h2>
+        <table class="data-table" id="alternatives_table">
+            <thead>
+                <tr>
+                    <th>Альтернатива</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alt in all_alt %}
+                <tr data-id="{{ alt.id }}">
+                    <td>{{ alt.name }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_alt', alt_id=alt.id) }}" method="post" class="inline-form">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Удалить {{ alt.name|escape }}?')">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Секция критериев -->
+    <div class="top-section">
+        <h1>Критерии</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput_cr" placeholder="Поиск..." class="search-input">
+            <button id="addButton_cr" class="btn btn-primary">Добавить</button>
+        </div>
+        <div id="suggestions_cr" class="suggestions-container"></div>
+    </div>
+
+    <div class="bottom-section">
+        <h2>Выбранные критерии для анализа:</h2>
+        <table class="data-table" id="criterion_table">
+            <thead>
+                <tr>
+                    <th>Критерий</th>
+                    <th>Действия</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cr in cr_cr %}
+                <tr data-id="{{ cr.id }}">
+                    <td>{{ cr.name }}</td>
+                    <td>
+                        <form action="{{ url_for('delete_cr', cr_id=cr.id) }}" method="post" class="inline-form">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Удалить {{ cr.name|escape }}?')">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="buttons-container">
+        <dialog id="confirmDialog">
+            <p class="dialog-message">Вы уверены?<br>
+                После записи наборы альтернатив и критериев нельзя будет изменить.</p>
+            <div class="dialog_buttons">
+                <button id="confirmYes" class="dialog_button">Да</button>
+                <button id="confirmNo" class="dialog_button">Нет</button>
+            </div>
+        </dialog>
+        <button id="leaveButton" type="button">Записать</button>
+    </div>
+</div>
+
+<style>
+.search-container {
+    margin: 15px 0;
+    display: flex;
+    gap: 10px;
+}
+
+.search-input {
+    padding: 8px;
+    flex-grow: 1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.suggestions-container {
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    max-height: 200px;
+    overflow-y: auto;
+    margin-top: 5px;
+    display: none;
+}
+
+.suggestion {
+    padding: 8px;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+}
+
+.suggestion:hover {
+    background-color: #f5f5f5;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+.data-table th, .data-table td {
+    padding: 10px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.data-table th {
+    background-color: #f2f2f2;
+}
+
+.btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background-color: #007bff;
+    color: white;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+}
+
+.inline-form {
+    display: inline;
+}
+</style>
+
+<script>
+// Общие функции
+function escapeHtml(text) {
+    return text.replace(/&/g, "&amp;")
+               .replace(/</g, "&lt;")
+               .replace(/>/g, "&gt;")
+               .replace(/"/g, "&quot;")
+               .replace(/'/g, "&#039;");
+}
+
+const dialog = document.getElementById('confirmDialog');
+const leaveButton = document.getElementById('leaveButton');
+const confirmYes = document.getElementById('confirmYes');
+const confirmNo = document.getElementById('confirmNo');
+
+leaveButton.addEventListener('click', function(e) {
+    dialog.showModal();
+});
+
+confirmYes.addEventListener('click', function() {
+    dialog.close();
+    window.location.href = "{{ url_for('save_task') }}";
+});
+
+confirmNo.addEventListener('click', function() {
+    dialog.close();
+});
+
+dialog.addEventListener('cancel', function(e) {
+    e.preventDefault();
+});
+
+async function blinkRow(row) {
+    const originalColor = row.style.backgroundColor;
+    const blinkCount = 2;
+    const blinkDuration = 100;
+
+    for (let i = 0; i < blinkCount; i++) {
+        row.style.backgroundColor = 'rgba(255, 0, 0, 0.3)';
+        await new Promise(resolve => setTimeout(resolve, blinkDuration));
+        row.style.backgroundColor = originalColor;
+        await new Promise(resolve => setTimeout(resolve, blinkDuration));
+    }
+}
+
+// Объект для управления элементами
+const elements = {
+    alt: {
+        searchInput: document.getElementById('searchInput_alt'),
+        addButton: document.getElementById('addButton_alt'),
+        suggestions: document.getElementById('suggestions_alt'),
+        table: document.getElementById('alternatives_table')
+    },
+    cr: {
+        searchInput: document.getElementById('searchInput_cr'),
+        addButton: document.getElementById('addButton_cr'),
+        suggestions: document.getElementById('suggestions_cr'),
+        table: document.getElementById('criterion_table')
+    }
+};
+
+// Общие обработчики
+function setupHandlers(type) {
+    const el = elements[type];
+
+    // Проверка на дублирование
+    function isDuplicate(name) {
+        const rows = el.table.querySelectorAll('tbody td:first-child');
+        return Array.from(rows).some(cell => cell.textContent === name);
+    }
+
+    // Добавление новой строки
+    function addRow(id, name, deleteUrl) {
+        const row = document.createElement('tr');
+        row.dataset.id = id;
+
+        const nameCell = document.createElement('td');
+        nameCell.textContent = name;
+
+        const actionCell = document.createElement('td');
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.action = deleteUrl;
+        form.className = 'inline-form';
+
+        const button = document.createElement('button');
+        button.type = 'submit';
+        button.className = 'btn btn-danger';
+        button.textContent = 'Удалить';
+        button.onclick = () => confirm(`Удалить ${escapeHtml(name)}?`);
+
+        form.appendChild(button);
+        actionCell.appendChild(form);
+        row.appendChild(nameCell);
+        row.appendChild(actionCell);
+
+        el.table.querySelector('tbody').appendChild(row);
+    }
+
+    // Обработчик добавления
+    el.addButton.addEventListener('click', async function() {
+        const name = el.searchInput.value.trim();
+        if (!name) {
+            alert('Введите название');
+            return;
+        }
+
+        try {
+            const response = await fetch(`/filltask_page/add_${type}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: name })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (!isDuplicate(name)) {
+                    addRow(data.id, name, `/filltask_page/delete_${type}/${data.id}`);
+                    el.searchInput.value = '';
+                    el.suggestions.innerHTML = '';
+                } else {
+                    const existingRow = Array.from(el.table.querySelectorAll('td'))
+                        .find(td => td.textContent === name).closest('tr');
+                    await blinkRow(existingRow);
+                }
+            }
+        } catch (error) {
+            console.error('Ошибка:', error);
+        }
+    });
+
+    // Обработчик поиска
+    el.searchInput.addEventListener('input', async function() {
+        const query = this.value.trim();
+        el.suggestions.innerHTML = '';
+        el.suggestions.style.display = 'none';
+
+        if (query.length >= 2) {
+            try {
+                const response = await fetch(`/filltask_page/search_${type}?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+
+                if (data.length > 0) {
+                    data.forEach(item => {
+                        const suggestion = document.createElement('div');
+                        suggestion.className = 'suggestion';
+                        suggestion.dataset.id = item.id;
+                        suggestion.textContent = item.name;
+                        el.suggestions.appendChild(suggestion);
+                    });
+                    el.suggestions.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Ошибка поиска:', error);
+            }
+        }
+    });
+
+    // Обработчик выбора из подсказок
+    el.suggestions.addEventListener('click', async function(e) {
+        if (e.target.classList.contains('suggestion')) {
+            const id = e.target.dataset.id;
+            const name = e.target.textContent;
+
+            if (!isDuplicate(name)) {
+                try {
+                    const response = await fetch(`/filltask_page/add_task_${type}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ id: id })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        addRow(data.id, name, `/filltask_page/delete_${type}/${data.id}`);
+                        el.searchInput.value = '';
+                        el.suggestions.innerHTML = '';
+                        el.suggestions.style.display = 'none';
+                    }
+                } catch (error) {
+                    console.error('Ошибка:', error);
+                }
+            } else {
+                const existingRow = Array.from(el.table.querySelectorAll('td'))
+                    .find(td => td.textContent === name).closest('tr');
+                await blinkRow(existingRow);
+            }
+        }
+    });
+}
+
+// Инициализация обработчиков
+setupHandlers('alt');
+setupHandlers('cr');
+</script>
+
+{% endblock %}
+{% block additional_content %}
+{% endblock %}

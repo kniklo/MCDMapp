@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <!-- Блок авторизации -->
+    <div class="auth-section">
+        {% if current_user.is_authenticated %}
+            <p>Вы вошли как: {{ current_user.username }} | <a href="{{ url_for('logout') }}">Выйти</a></p>
+        {% else %}
+            <a href="{{ url_for('login') }}">Войти</a> | <a href="{{ url_for('register') }}">Зарегистрироваться</a>
+        {% endif %}
+    </div>
+
+    <div class="top-section">
+    <h1>Эксперт</h1>
+    {% if current_user.is_authenticated %}
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.name.label }}
+                {{ form.name() }}
+                {% for error in form.name.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.submit() }}
+            </p>
+        </form>
+    {% else %}
+        <p>Для работы с экспертами необходимо <a href="{{ url_for('login') }}">войти</a> в систему.</p>
+    {% endif %}
+    </div>
+
+    <div class="bottom-section">
+    <h2>Все эксперты:</h2>
+    {% if current_user.is_authenticated %}
+        <table border="1">
+            <tr>
+                <th>Имя</th>
+                <th></th>
+            </tr>
+            {% for expert in all_expert %}
+                <tr {% if expert.id == selected_expert %}style="background-color: lightgreen;"{% endif %}>
+                    <td>{{ expert.name }}</td>
+                    <td>
+                        <form action="{{ url_for('select_expert', expert_id=expert.id) }}" method="post" style="display:inline;">
+                            <button type="submit">Выбрать</button>
+                        </form>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+        <div class="buttons-container">
+            <form action="{{ url_for('task_page') }}" method="post">
+                <button type="submit" {{ 'disabled' if selected_expert == 0 else '' }}
+                        title="{{ 'Выберите эксперта' if selected_expert == 0 else '' }}">
+                    Далее к заданиям
+                </button>
+            </form>
+        </div>
+    {% else %}
+        <p>Авторизуйтесь для просмотра списка экспертов.</p>
+    {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block additional_content %}
+{% endblock %}

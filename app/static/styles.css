@@ -1,0 +1,148 @@
+/* Основные стили для body */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    margin: 0;
+    padding: 20px;
+}
+
+/* Стили для заголовков */
+h1, h2 {
+    color: #333;
+}
+
+/* Стили для таблиц */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr.dragging {
+            opacity: 0.5;
+        }
+
+.drop-zone {
+            border-top: 2px solid #007bff; /* Синяя линия для обозначения зоны вставки */
+        }
+/* Стили для форм */
+form {
+    margin-bottom: 20px;
+}
+
+input[type="text"], input[type="number"] {
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Стили для кнопки "Delete" */
+button[type="submit"] {
+    background-color: #dc3545;
+}
+
+button[type="submit"]:hover {
+    background-color: #c82333;
+}
+
+#suggestions {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    z-index: 1000;
+}
+
+.suggestion {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.suggestion:hover {
+    background: #f2f2f2;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+}
+
+.disabled-form {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.disabled-text {
+    color: #999;
+}
+
+dialog::backdrop {
+ background-color: rgba(0, 0, 0, 0.5);
+}
+
+dialog {
+ width: 300px;
+ padding: 20px;
+ border-radius: 5px;
+ background-color: white;
+}
+
+.dialog-message {
+ text-align: center;
+ margin-bottom: 20px;
+}
+
+.dialog_buttons {
+ display: flex;
+ justify-content: space-between;
+ margin-top: 20px;
+}
+
+.dialog_button {
+ padding: 10px 20px;
+ border: none;
+ border-radius: 3px;
+ cursor: pointer;
+}
+
+#confirmYes {
+ background-color: #28a745;
+ color: white;
+}
+
+#confirmNo {
+ background-color: #dc3545;
+ color: white;
+}
+
+.selectedrow_intable {
+        background-color: #d3d3f3; /* Серый цвет фона */
+    }

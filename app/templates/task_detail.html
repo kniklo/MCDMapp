@@ -1,0 +1,525 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="top-section">
+        <h1>Задача</h1>
+        <div style="display: flex; align-items: flex-start; gap: 20px;">
+            <table class="borderless-table" id="task_table">
+                <tbody>
+                    <tr>
+                        <td class="label-cell">Name:</td>
+                        <td class="value-cell">{{task.name}}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Description:</td>
+                        <td class="value-cell">{{task.description}}</td>
+                    </tr>
+                    <tr>
+                        <td class="label-cell">Created:</td>
+                        <td class="value-cell">{{task.create_date}} by {{task.owner}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="split-button-container">
+                <a href="{{ url_for('index') }}" class="half-button top-button">
+                    <span>Main page</span>
+                </a>
+                <div class="button-gap"></div>
+                <a href="{{ url_for('analyze_task', task_id=task.id) }}" class="half-button bottom-button">
+                    <span>Analyse</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="lists-container">
+        <div class="list">
+            <h3>Alternatives</h3>
+            <ul>
+                {% for alt in all_alt %}
+                    <li>{{ alt.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="list">
+            <h3>Criterias</h3>
+            <ul>
+                {% for cr in cr_cr %}
+                    <li>{{ cr.name }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    <div class="bottom-section">
+    <h2>Analysis</h2>
+        <table class="data-table" id="analysis_table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Expert</th>
+                    <th>Best alternative</th>
+                    <th>With value</th>
+                    <th>
+                        <a href="#" id="toggle-all" class="toggle-link">Check all</a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in detail %}
+                <tr>
+                    <td>{{ item.an.create_date.strftime('%Y-%m-%d %H:%M') if item.an.create_date else 'N/A' }}</td>
+                    <td>{{ item.an.name }}</td>
+                    <td>{{ item.alt_name if item.alt_name else 'Not defined' }}</td>
+                    <td>
+                        {% if item.alt_value %}
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width: {{ item.alt_value * 100 }}%">
+                                <span class="progress-value">{{ "%.2f"|format(item.alt_value) }}</span>
+                            </div>
+                        </div>
+                        {% else %}
+                        N/A
+                        {% endif %}
+                    </td>
+                    <td>
+                        <input type="checkbox" class="analysis-checkbox" name="selected_analyses" value="{{ item.an.id }}">
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="buttons-container">
+            <button type="button" id="summary-btn" class="summary-button">Summary analysis</button>
+        </div>
+        <div id="summary-results"></div>
+    </div>
+</div>
+<style>
+     .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+    }
+
+    .data-table th, .data-table td {
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    .data-table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+
+    .data-table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .data-table tr:hover {
+        background-color: #f1f1f1;
+    }
+
+    .toggle-link {
+        color: #3498db;
+        text-decoration: none;
+        font-weight: normal;
+    }
+
+    .toggle-link:hover {
+        text-decoration: underline;
+    }
+
+    .analysis-checkbox {
+        transform: scale(1.3);
+        cursor: pointer;
+    }
+
+    .data-table th:last-child,
+    .data-table td:last-child {
+        text-align: center;
+        width: 100px;
+    }
+
+    .progress-container {
+        width: 100%;
+        background-color: #e0e0e0;
+        border-radius: 4px;
+        height: 25px;
+        position: relative;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background-color: #4CAF50;
+        border-radius: 4px;
+        position: relative;
+    }
+
+    .progress-value {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: white;
+        font-weight: bold;
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+        font-size: 12px;
+    }
+
+    .btn-analysis {
+        color: #3498db;
+        text-decoration: none;
+        font-size: 16px;
+        padding: 5px 10px;
+        transition: color 0.3s;
+    }
+
+    .btn-analysis:hover {
+        color: #2980b9;
+    }
+
+    .lists-container {
+        display: flex;
+        gap: 30px;
+        margin: 20px 0;
+    }
+
+    .list {
+        flex: 1;
+        background-color: #f8f9fa;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .list h3 {
+        margin-top: 0;
+        color: #333;
+        border-bottom: 1px solid #ddd;
+        padding-bottom: 8px;
+    }
+
+    .list ul {
+        padding-left: 20px;
+        margin-bottom: 0;
+    }
+
+    .list li {
+        margin-bottom: 5px;
+    }
+
+    .split-button-container {
+        position: relative;
+        width: 110px;
+        height: 110px;  /* Увеличиваем высоту для промежутка */
+        border-radius: 50%;
+        overflow: hidden;
+    }
+
+    .half-button {
+        position: absolute;
+        left: 0;
+        width: 100%;
+        height: 48%;  /* Уменьшаем высоту кнопок для промежутка */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+        color: #333;
+        transition: all 0.3s ease;
+        text-align: center;
+        box-sizing: border-box;
+        padding: 0 10px;
+    }
+
+    .top-button {
+        top: 0;
+        background-color: rgba(200, 255, 200, 0.7);
+        border-radius: 50% 50% 0 0;
+    }
+
+    .bottom-button {
+        bottom: 0;
+        background-color: rgba(200, 255, 200, 0.7);
+        border-radius: 0 0 50% 50%;
+    }
+
+    .button-gap {
+        position: absolute;
+        top: 48%;
+        left: 0;
+        width: 100%;
+        height: 4%;
+        background-color: white;  /* Цвет фона контейнера */
+        z-index: 2;
+    }
+
+    .top-button:hover {
+        background-color: rgba(220, 255, 220, 0.9);
+        transform: scale(1.05);
+    }
+
+    .bottom-button:hover {
+        background-color: rgba(220, 255, 220, 0.9);
+        transform: scale(1.05);
+    }
+
+    .half-button span {
+        font-size: 14px;
+        line-height: 1.2;
+        display: inline-block;
+        vertical-align: middle;
+    }
+
+    .borderless-table {
+        border: none;
+        border-collapse: collapse;
+        width: 100%;
+        max-width: 600px;
+    }
+
+    .borderless-table tr {
+        border: none;
+    }
+
+    .label-cell {
+        border: none;
+        padding: 4px 8px;
+        font-weight: bold;
+        vertical-align: top;
+        text-align: right;
+        width: 30%;
+    }
+
+    .value-cell {
+        border: none;
+        padding: 4px 8px;
+        vertical-align: top;
+        text-align: left;
+    }
+    .summary-button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 20px;
+    transition: background-color 0.3s;
+}
+
+.summary-button:hover {
+    background-color: #45a049;
+}
+
+.summary-button:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.buttons-container {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.loading {
+    padding: 20px;
+    text-align: center;
+    font-style: italic;
+    color: #666;
+}
+
+.error-message {
+    color: #d9534f;
+    padding: 20px;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Стили для таблиц */
+.bottom-section {
+    margin-top: 30px;
+}
+
+#criterion_table, #alternative_table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+}
+
+#criterion_table th, #criterion_table td,
+#alternative_table th, #alternative_table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+.progress-container {
+    width: 100%;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    height: 25px;
+    position: relative;
+}
+
+.progress-bar {
+    height: 100%;
+    border-radius: 4px;
+    position: relative;
+}
+
+.progress-value {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+    font-size: 12px;
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toggleAllLink = document.getElementById('toggle-all');
+    const checkboxes = document.querySelectorAll('.analysis-checkbox');
+    let allChecked = false;
+
+    toggleAllLink.addEventListener('click', function(e) {
+        e.preventDefault();
+
+        allChecked = !allChecked;
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = allChecked;
+        });
+
+        this.textContent = allChecked ? 'Uncheck all' : 'Check all';
+    });
+});
+    document.addEventListener('DOMContentLoaded', function() {
+    const summaryBtn = document.getElementById('summary-btn');
+    const summaryResults = document.getElementById('summary-results');
+
+    summaryBtn.addEventListener('click', async function() {
+        const selectedAnalyses = Array.from(document.querySelectorAll('.analysis-checkbox:checked'))
+                                     .map(checkbox => checkbox.value);
+
+        if (selectedAnalyses.length === 0) {
+            alert('Please, choose at least one analysis ');
+            return;
+        }
+
+        try {
+            // Показываем индикатор загрузки
+            summaryBtn.disabled = true;
+            summaryBtn.textContent = 'Loading...';
+            summaryResults.innerHTML = '<div class="loading">Calculating...</div>';
+
+            // Отправляем запрос
+            const response = await fetch("{{ url_for('task_summary', task_id=task.id) }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({
+                    analyses_ids: selectedAnalyses
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error(data.error || 'Unknown server error');
+            }
+
+            // Генерируем HTML для результатов
+            let resultsHTML = `
+                <div class="bottom-section">
+                    <h1>Average criteria values</h1>
+                    <table id="criterion_table" border="1">
+                        <tr>
+                            <th>Criteria</th>
+                            <th>Importance</th>
+                        </tr>`;
+
+            // Добавляем строки для критериев
+            data.avg_criteria.forEach((criterion, index) => {
+                const colors = ['#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0', '#607D8B'];
+                const color = colors[index % colors.length];
+                const width = criterion.avg_value * 100;
+                const value = criterion.avg_value.toFixed(2);
+
+                resultsHTML += `
+                    <tr>
+                        <td>${criterion.name}</td>
+                        <td>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: ${width}%; background-color: ${color};">
+                                    <span class="progress-value">${value}</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
+
+            resultsHTML += `
+                    </table>
+                </div>
+                <div class="bottom-section">
+                    <h1>Average alternatives rate</h1>
+                    <table id="alternative_table" border="1">
+                        <tr>
+                            <th>Alternatives</th>
+                            <th>Rating</th>
+                        </tr>`;
+
+            // Добавляем строки для альтернатив
+            data.avg_alternatives.forEach((alternative, index) => {
+                const colors = ['#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0', '#607D8B'];
+                const color = colors[index % colors.length];
+                const width = alternative.avg_value * 100;
+                const value = alternative.avg_value.toFixed(2);
+
+                resultsHTML += `
+                    <tr>
+                        <td>${alternative.name}</td>
+                        <td>
+                            <div class="progress-container">
+                                <div class="progress-bar" style="width: ${width}%; background-color: ${color};">
+                                    <span class="progress-value">${value}</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>`;
+            });
+
+            resultsHTML += `
+                    </table>
+                </div>`;
+
+            // Вставляем сгенерированный HTML
+            summaryResults.innerHTML = resultsHTML;
+
+        } catch (error) {
+            console.error('Ошибка:', error);
+            summaryResults.innerHTML = `
+                <div class="error-message">
+                    Произошла ошибка: ${error.message}
+                </div>`;
+        } finally {
+            summaryBtn.disabled = false;
+            summaryBtn.textContent = 'Сводный анализ';
+        }
+    });
+});
+</script>
+{% endblock %}
+{% block additional_content %}
+{% endblock %}

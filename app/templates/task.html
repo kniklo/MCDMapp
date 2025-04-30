@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block content %}
+{% if not current_user.is_authenticated %}
+<style>
+    body {
+        background: url('/static/index.png') no-repeat center center fixed;
+        background-size: cover;
+    }
+    .container {
+        background-color: rgba(255, 255, 255, 0.85);
+    }
+</style>
+{% endif %}
+
+<!-- Блок авторизации -->
+<div class="auth-section">
+    {% if current_user.is_authenticated %}
+        <p>You are logged in: {{ current_user.username }} | <a href="{{ url_for('logout') }}">Logoff</a></p>
+    {% else %}
+        <a href="{{ url_for('login') }}">Login</a> | <a href="{{ url_for('register') }}">Register</a>
+    {% endif %}
+</div>
+
+{% if current_user.is_authenticated %}
+<div class="container">
+    <!-- Форма добавления задачи -->
+    <div class="top-section">
+        <form action="" method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <p>
+                {{ form.name.label }}
+                {{ form.name() }}
+                {{ form.description.label }}
+                {{ form.description() }}
+                {% for error in form.name.errors %}
+                    <span style="color: red;">[{{ error }}]</span>
+                {% endfor %}
+            </p>
+            <p>
+                {{ form.submit() }}
+            </p>
+        </form>
+    </div>
+
+    <!-- Фильтры -->
+    <div class="filters-section" style="margin: 20px 0; display: flex; align-items: center; gap: 15px;">
+        <h3 style="margin: 0;">Filters:</h3>
+        <form method="GET" action="{{ url_for('index') }}" style="display: flex; align-items: center; gap: 10px;">
+            <div style="display: flex; align-items: center;">
+                <label for="date_filter" style="margin-right: 5px;">Date:</label>
+                <select name="date_filter" id="date_filter" style="padding: 5px;">
+                    <option value="">All</option>
+                    <option value="today" {% if request.args.get('date_filter') == 'today' %}selected{% endif %}>Today</option>
+                    <option value="week" {% if request.args.get('date_filter') == 'week' %}selected{% endif %}>Week</option>
+                    <option value="month" {% if request.args.get('date_filter') == 'month' %}selected{% endif %}>Month</option>
+                </select>
+            </div>
+
+            <div style="display: flex; align-items: center;">
+                <label for="owner_filter" style="margin-right: 5px;">Owner:</label>
+                <select name="owner_filter" id="owner_filter" style="padding: 5px;">
+                    <option value="">All</option>
+                    {% for user in all_users %}
+                        <option value="{{ user.id }}" {% if request.args.get('owner_filter')|int == user.id %}selected{% endif %}>
+                            {{ user.username }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" style="padding: 5px 10px;">Apply</button>
+            <a href="{{ url_for('index') }}" style="padding: 5px 10px; background: #f0f0f0; border: 1px solid #ccc; text-decoration: none; color: black;">Discard</a>
+        </form>
+    </div>
+
+    <!-- Таблица задач -->
+    <div class="bottom-section">
+        <h2>Tasks:</h2>
+        <table border="1" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="padding: 8px;">Name</th>
+                    <th style="padding: 8px;">Description</th>
+                    <th style="padding: 8px;">Owner</th>
+                    <th style="padding: 8px;">Create date</th>
+                    <th style="padding: 8px;">Analysis</th>
+                    <th style="padding: 8px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in all_task %}
+                    <tr {% if task.fl_new == 1 %}style="background-color: #fffacd;"
+                        {% elif task.analyses|length > 0 %}style="background-color: #cdffcd;"
+                        {% endif %}>
+                        <td style="padding: 8px;">{{ task.name }}</td>
+                        <td style="padding: 8px;">{{ task.description }}</td>
+                        <td style="padding: 8px;">{{ task.owner_user.username if task.owner_user else 'N/A' }}</td>
+                        <td style="padding: 8px;">{{ task.create_date.strftime('%Y-%m-%d %H:%M') }}</td>
+                        <td style="padding: 8px; text-align: center;">
+                            {{ task.analyses|length }}
+                        </td>
+                        <td style="padding: 8px;">
+                            <div class="dropdown" style="position: relative; display: inline-block;">
+                                <button class="dropbtn" style="padding: 3px 6px;">Choose ▼</button>
+                                <div class="dropdown-content" style="display: none; position: absolute; background-color: #f9f9f9; min-width: 160px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); z-index: 1;">
+                                    {% if task.fl_new == 1 %}
+                                        <a href="{{ url_for('fill_task', task_id=task.id) }}">Fill task</a>
+                                    {% else %}
+                                        {% if task.analyses|length == 0 %}
+                                            <a href="{{ url_for('change_task', task_id=task.id) }}">Change task</a>
+                                        {% endif %}
+                                        <a href="{{ url_for('analyze_task', task_id=task.id) }}">Analyse</a>
+                                        <a href="{{ url_for('task_details', task_id=task.id) }}">Detailed</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+// JavaScript для работы выпадающего меню
+document.querySelectorAll('.dropbtn').forEach(button => {
+    button.addEventListener('click', function(e) {
+        e.stopPropagation();
+        const dropdown = this.nextElementSibling;
+        dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+    });
+});
+
+// Закрываем выпадающее меню при клике вне его
+window.addEventListener('click', function() {
+    document.querySelectorAll('.dropdown-content').forEach(dropdown => {
+        dropdown.style.display = 'none';
+    });
+});
+</script>
+
+<style>
+.dropdown-content a {
+    color: black;
+    padding: 8px 12px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+</style>
+{% endif %}
+{% endblock %}

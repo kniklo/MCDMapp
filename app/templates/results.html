@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="top-section">
+        <h1>Task</h1>
+        <table class="borderless-table" id="task_table">
+            <tbody>
+                <tr>
+                    <td class="label-cell">Name:</td>
+                    <td class="value-cell">{{task.name}}</td>
+                </tr>
+                <tr>
+                    <td class="label-cell">Description:</td>
+                    <td class="value-cell">{{task.description}}</td>
+                </tr>
+                <tr>
+                    <td class="label-cell">Created:</td>
+                    <td class="value-cell">{{task.create_date}} by {{task.owner}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="bottom-section">
+        <h1>Criteria</h1>
+        <table id="criterion_table" border="1">
+            <tr>
+                <th>Criteria</th>
+                <th>Importance</th>
+            </tr>
+            {% for cr in cr_cr %}
+                <tr>
+                    <td>{{ cr.name }}</td>
+                    <td>
+                        <div class="progress-container">
+                            {% set colors = ['#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0', '#607D8B'] %}
+                            <div class="progress-bar" style="width: {{ cr.subj_value_relative * 100 }}%; background-color: {{ colors[loop.index0 % colors|length] }};">
+                                <span class="progress-value">{{ "%.2f"|format(cr.subj_value_relative) }}</span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <div class="bottom-section">
+        <h1>Alternatives</h1>
+        <table id="alternative_table" border="1">
+            <tr>
+                <th>Alternatives</th>
+                <th>Rating</th>
+            </tr>
+            {% for alt in alt_alt %}
+                <tr>
+                    <td>{{ alt.name }}</td>
+                    <td>
+                        <div class="progress-container">
+                            {% set colors = ['#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0', '#607D8B'] %}
+                            <div class="progress-bar" style="width: {{ alt.final_value * 100 }}%; background-color: {{ colors[loop.index0 % colors|length] }};">
+                                <span class="progress-value">{{ "%.2f"|format(alt.final_value) }}</span>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+    <form id="summary-form" method="POST" action="{{ url_for('task_summary', task_id=task.id) }}">
+    <div class="buttons-container">
+        <button type="button" id="summary-btn" class="summary-button">Сводный анализ</button>
+    </div>
+    <div id="summary-results" style="display: none;">
+        <div class="bottom-section">
+            <h1>Средние значения критериев</h1>
+            <table id="criterion_table" border="1">
+                <tr>
+                    <th>Criteria</th>
+                    <th>Importance</th>
+                </tr>
+                {% for cr in cr_cr %}
+                    <tr>
+                        <td>{{ cr.name }}</td>
+                        <td>
+                            <div class="progress-container">
+                                {% set colors = ['#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0', '#607D8B'] %}
+                                <div class="progress-bar avg-criteria"
+                                     data-criterion-id="{{ cr.id }}"
+                                     style="width: 0%; background-color: {{ colors[loop.index0 % colors|length] }};">
+                                    <span class="progress-value">0.00</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        <div class="bottom-section">
+            <h1>Средние оценки альтернатив</h1>
+            <table id="alternative_table" border="1">
+                <tr>
+                    <th>Alternatives</th>
+                    <th>Rating</th>
+                </tr>
+                {% for alt in all_alt %}
+                    <tr>
+                        <td>{{ alt.name }}</td>
+                        <td>
+                            <div class="progress-container">
+                                {% set colors = ['#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0', '#607D8B'] %}
+                                <div class="progress-bar avg-alternative"
+                                     data-alternative-id="{{ alt.id }}"
+                                     style="width: 0%; background-color: {{ colors[loop.index0 % colors|length] }};">
+                                    <span class="progress-value">0.00</span>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+</form>
+    <div class="buttons-container">
+        <form action="{{ url_for('index') }}" method="post">
+            <button type="submit">Back to main</button>
+        </form>
+        <form action="{{ url_for('alternative_evaluation') }}" method="post">
+            <button type="submit">Back to analysis</button>
+        </form>
+    </div>
+</div>
+<style>
+    #criterion_table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+    }
+
+    #criterion_table th, #criterion_table td {
+        padding: 10px;
+        border: 1px solid #ddd;
+        text-align: left;
+    }
+
+    #criterion_table th {
+        background-color: #f2f2f2;
+    }
+
+    .progress-container {
+        width: 100%;
+        background-color: #e0e0e0;
+        border-radius: 4px;
+        height: 25px;
+        position: relative;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background-color: #4CAF50;
+        border-radius: 4px;
+        transition: width 0.3s ease;
+        position: relative;
+    }
+
+    .progress-value {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: white;
+        font-weight: bold;
+        text-shadow: 1px 1px 1px rgba(0,0,0,0.5);
+    }
+</style>
+{% endblock %}
