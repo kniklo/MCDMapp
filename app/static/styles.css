@@ -1,148 +1,135 @@
-/* Основные стили для body */
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
     margin: 0;
-    padding: 20px;
-}
-
-/* Стили для заголовков */
-h1, h2 {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
     color: #333;
 }
 
-/* Стили для таблиц */
-table {
+.container {
+    max-width: 900px;
+    margin: 10px auto;
+    margin-top: 60px;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.container2 {
+    max-width: 900px;
+    margin: 10px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.auth-section {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 10px 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.auth-section a {
+    margin-left: 10px;
+    color: #007bff;
+    text-decoration: none;
+}
+
+.auth-section a:hover {
+    text-decoration: underline;
+}
+
+form input[type="text"],
+form input[type="password"],
+form input[type="email"],
+form select {
     width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-}
-
-table, th, td {
-    border: 1px solid #ddd;
-}
-
-th, td {
-    padding: 10px;
-    text-align: left;
-}
-
-th {
-    background-color: #f2f2f2;
-}
-
-tr.dragging {
-            opacity: 0.5;
-        }
-
-.drop-zone {
-            border-top: 2px solid #007bff; /* Синяя линия для обозначения зоны вставки */
-        }
-/* Стили для форм */
-form {
-    margin-bottom: 20px;
-}
-
-input[type="text"], input[type="number"] {
     padding: 8px;
-    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
     box-sizing: border-box;
 }
 
-button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
+form button, .button {
+    padding: 10px 18px;
     border: none;
+    border-radius: 6px;
+    background-color: #00aa7b;
+    color: white;
     cursor: pointer;
+    transition: background 0.3s ease;
 }
 
-button:hover {
-    background-color: #0056b3;
+form button:hover, .button:hover {
+    background-color: #008c64;
 }
 
-/* Стили для кнопки "Delete" */
-button[type="submit"] {
-    background-color: #dc3545;
+.flash-messages {
+    max-width: 800px;
+    margin: 20px auto;
+    background-color: #fdecea;
+    color: #b71c1c;
+    border-left: 4px solid #f44336;
+    padding: 10px 15px;
+    border-radius: 4px;
 }
 
-button[type="submit"]:hover {
-    background-color: #c82333;
-}
-
-#suggestions {
-    position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    max-height: 200px;
-    overflow-y: auto;
+table {
     width: 100%;
-    z-index: 1000;
+    border-collapse: collapse;
+    margin-top: 20px;
 }
 
-.suggestion {
-    padding: 5px;
-    cursor: pointer;
+table thead {
+    background-color: #f0f0f0;
 }
 
-.suggestion:hover {
-    background: #f2f2f2;
+table th, table td {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
 }
 
-.search-container {
+.filters-section {
     display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin: 20px 0;
     align-items: center;
 }
 
-.disabled-form {
-    pointer-events: none;
-    opacity: 0.5;
-    cursor: not-allowed;
+.dropdown {
+    position: relative;
+    display: inline-block;
 }
 
-.disabled-text {
-    color: #999;
+.dropdown-content {
+    display: none;
+    position: absolute;
+    min-width: 160px;
+    z-index: 100;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-dialog::backdrop {
- background-color: rgba(0, 0, 0, 0.5);
+.dropdown-content a {
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+    color: #333;
 }
 
-dialog {
- width: 300px;
- padding: 20px;
- border-radius: 5px;
- background-color: white;
+.dropdown-content a:hover {
+    background-color: #f5f5f5;
 }
-
-.dialog-message {
- text-align: center;
- margin-bottom: 20px;
-}
-
-.dialog_buttons {
- display: flex;
- justify-content: space-between;
- margin-top: 20px;
-}
-
-.dialog_button {
- padding: 10px 20px;
- border: none;
- border-radius: 3px;
- cursor: pointer;
-}
-
-#confirmYes {
- background-color: #28a745;
- color: white;
-}
-
-#confirmNo {
- background-color: #dc3545;
- color: white;
-}
-
-.selectedrow_intable {
-        background-color: #d3d3f3; /* Серый цвет фона */
-    }
