@@ -38,25 +38,26 @@
         <button class="instructions-btn" onclick="scrollToInstructions()">Instructions</button>
 
         <!-- Таблица критериев -->
-        <table class="criteria-table">
-            <tr>
-                <th>Criterion</th>
-                <th>Importance Score</th>
-            </tr>
-            {% for cr in cr_cr %}
-            <tr>
-                <td>{{ cr.name }}</td>
-                <td>
-                    <select class="score-select" onchange="updateCriterionValue({{ cr.id }}, this.value)">
-                        {% for i in range(1, 11) %}
-                            <option value="{{ i }}" {% if i == cr.subj_value %}selected{% endif %}>{{ i }}</option>
-                        {% endfor %}
-                    </select>
-                </td>
-            </tr>
-            {% endfor %}
-        </table>
-
+        <div class="criterion-block">
+            <table class="criteria-table">
+                <tr>
+                    <th>Criterion</th>
+                    <th>Importance Score</th>
+                </tr>
+                {% for cr in cr_cr %}
+                <tr>
+                    <td>{{ cr.name }}</td>
+                    <td>
+                        <select class="score-select" onchange="updateCriterionValue({{ cr.id }}, this.value)">
+                            {% for i in range(1, 11) %}
+                                <option value="{{ i }}" {% if i == cr.subj_value %}selected{% endif %}>{{ i }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
         <!-- Кнопка Next -->
         <div class="next-container">
             <button class="nav-button primary" onclick="window.location.href='{{ url_for('alternative_evaluation') }}'">
@@ -84,7 +85,7 @@
                          class="custom-image">
                 </div>
                 <div class="tip-box">
-                    <p>Tip: Use the full scale! Don't rate everything as 7+</p>
+                    <p><b>Tip:</b> Use the full scale! Don't rate everything as 7+</p>
                 </div>
             </div>
             <button class="top-btn" onclick="scrollToTop()">↑ On top</button>
@@ -93,6 +94,15 @@
 </div>
 
 <style>
+    .criterion-block {
+        margin-top: 40px;
+        margin-bottom: 40px;
+        border: 1px solid #ecf0f1;
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 60px;
+    }
+
     .custom-image {
     max-width: 100%;
     height: auto;
@@ -138,7 +148,6 @@
     .stage-selector {
         display: flex;
         gap: 15px;
-        margin-bottom: 30px;
     }
 
     .stage-dot {
@@ -208,7 +217,6 @@
     .criteria-table {
         width: 100%;
         margin: 25px 0;
-        margin-top: 60px;
         border-collapse: collapse;
     }
 
