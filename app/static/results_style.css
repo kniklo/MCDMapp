@@ -1,0 +1,130 @@
+.results-container {
+    padding: 20px;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+.results-layout {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    margin-bottom: 20px;
+}
+
+.task-info {
+    background: #f8f9fa;
+}
+
+.task-name {
+    color: #2c3e50;
+    margin-bottom: 15px;
+}
+
+.task-description {
+    line-height: 1.6;
+    color: #7f8c8d;
+}
+
+.toggle-description {
+    background: none;
+    border: none;
+    color: #3498db;
+    cursor: pointer;
+    padding: 5px 0;
+}
+
+.bar-chart {
+    margin: 20px 0;
+}
+
+.bar-chart.vertical {
+    height: 400px;
+    display: flex;
+    align-items: flex-end;
+    gap: 15px;
+}
+
+.bar-container {
+    position: relative;
+    flex: 1;
+    transition: height 0.5s ease;
+}
+
+.bar-container.leading .bar {
+    background: #27ae60;
+}
+
+.bar {
+    background: #3498db;
+    transition: width 0.5s ease;
+    position: relative;
+}
+
+.bar:after {
+    content: attr(data-value);
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-weight: bold;
+}
+
+.bar-chart.horizontal .bar-container {
+    margin: 10px 0;
+    height: 30px;
+    display: flex;
+    align-items: center;
+}
+
+.recommendation-card {
+    background: #27ae60;
+    color: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    margin-top: 30px;
+}
+
+.winner-name {
+    font-size: 2em;
+    margin: 15px 0;
+}
+
+.winner-score {
+    font-size: 1.5em;
+    font-weight: bold;
+}
+
+.trophy-icon {
+    font-size: 3em;
+}
+
+.collapsible .list-content {
+    max-height: 300px;
+    overflow-y: auto;
+    transition: max-height 0.3s ease;
+}
+
+.collapsible .list-content.collapsed {
+    max-height: 0;
+    overflow: hidden;
+}
+
+@media (max-width: 1200px) {
+    .results-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        order: 2;
+    }
+}

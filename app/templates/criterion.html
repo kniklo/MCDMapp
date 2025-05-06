@@ -1,340 +1,96 @@
 {% extends "base.html" %}
 
-{% block styles %}
-    {{ super() }}
-    <link rel="stylesheet" href="{{ url_for('static', filename='analysis_style.css') }}">
-{% endblock %}
 {% block content %}
 <div class="container">
-    <!-- Навигационная панель -->
-    <nav class="nav-panel">
-        <div class="stage-title">ANALYSIS | Criteria comparison</div>
-        <a href="{{ url_for('index') }}" class="back-button">← Back to main page</a>
-    </nav>
-
-    <!-- Блок этапов -->
-    <div class="stage-selector">
-        <div class="stage-dot active">1</div>
-        <div class="stage-dot" onclick="window.location.href='{{ url_for('alternative_evaluation') }}'">2</div>
-        <div class="stage-dot">3</div>
-    </div>
-
-    <!-- Основной контент -->
-    <div class="content-block">
-        <h1 class="main-title">Criteria comparison</h1>
-        <p class="sub-header">How important is each criterion for your decision?</p>
-
-        <!-- Шкала оценки -->
-        <div class="rating-scale">
+    <div class="top-section">
+        <h1>Criteria comparison</h1>
+        <h3>How impotant is each criterion for your decision ?</h3>
+        <div class="numbers-container">
             {% for number in range(1, 11) %}
-                <button class="number-btn">{{ number }}</button>
+                <div class="number-box">{{ number }}</div>
             {% endfor %}
         </div>
-        <div class="sub-header">
-            Where: 10 = "Cannot compromise on this!"
+        <div style="display: flex; font-size: 18px;">
+            Where: 1 = Who's there? and 10 = Cannot compromise on this!
         </div>
+    </div>
 
-        <!-- Кнопка инструкций -->
-        <button class="instructions-btn" onclick="scrollToInstructions()">Instructions</button>
-
-        <!-- Таблица критериев -->
-        <div class="criterion-block">
-            <table class="criteria-table">
-                <tr>
-                    <th>Criterion</th>
-                    <th>Importance Score</th>
-                </tr>
-                {% for cr in cr_cr %}
+    <div class="bottom-section">
+        <table id="criterion_table" border="1">
+            <tr>
+                <th>Criteria</th>
+                <th>Importance</th>
+            </tr>
+            {% for cr in cr_cr %}
                 <tr>
                     <td>{{ cr.name }}</td>
                     <td>
-                        <select class="score-select" onchange="updateCriterionValue({{ cr.id }}, this.value)">
+                        <select name="importance_{{ cr.id }}" onchange="updateCriterionValue({{ cr.id }}, this.value)">
                             {% for i in range(1, 11) %}
                                 <option value="{{ i }}" {% if i == cr.subj_value %}selected{% endif %}>{{ i }}</option>
                             {% endfor %}
                         </select>
                     </td>
                 </tr>
-                {% endfor %}
-            </table>
-        </div>
-        <!-- Кнопка Next -->
-        <div class="next-container">
-            <button class="nav-button primary" onclick="window.location.href='{{ url_for('alternative_evaluation') }}'">
-                Next Stage →
-            </button>
-        </div>
+            {% endfor %}
+        </table>
 
-        <!-- Разделитель -->
-        <div class="divider"></div>
-
-        <!-- Секция инструкций -->
-        <section id="instructions" class="instructions-section">
-            <h2>Instructions</h2>
-            <div class="instructions-content">
-                <p>Assign a score from 1 to 10 for each criterion:</p>
-                <div class="decision-guide">
-                    <h3>Key rules:</h3>
-                    <ul>
-                        <li>→ The bigger the difference between scores, the more important one criterion is over another</li>
-                        <li>→ Same scores = equal importance</li>
-                    </ul>
-                </div>
-                <div class="example-box">
-                    <img src="{{ url_for('static', filename='images/tip1criteria.png') }}"
-                         class="custom-image">
-                </div>
-                <div class="tip-box">
-                    <p><b>Tip:</b> Use the full scale! Don't rate everything as 7+</p>
-                </div>
-            </div>
-            <button class="top-btn" onclick="scrollToTop()">↑ On top</button>
-        </section>
+        <div class="buttons-container">
+            <form action="{{ url_for('index') }}" method="post">
+                <button type="submit">Back to main</button>
+            </form>
+           <form action="{{ url_for('alternative_evaluation') }}" method="post">
+                <button type="submit">Next</button>
+            </form>
+        </div>
     </div>
 </div>
-
 <style>
-    .criterion-block {
-        margin-top: 40px;
-        margin-bottom: 40px;
-        border: 1px solid #ecf0f1;
-        border-radius: 8px;
-        padding: 20px;
-        margin-top: 60px;
-    }
-
-    .custom-image {
-    max-width: 100%;
-    height: auto;
-    border-radius: 8px;
-    margin: 20px 0;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-    .tip-box {
-        background: #fff3cd;
-        padding: 15px;
-        border-radius: 6px;
-        margin-top: 20px;
-    }
-
-    /* Стили навигации */
-    .nav-panel {
+    .numbers-container {
         display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background: #f0f2f5;
-        padding: 15px 25px;
-        border-radius: 12px;
-        margin-bottom: 20px;
+        gap: 10px;
+        margin: 20px 0;
+        flex-wrap: wrap;
+        justify-content: center;
     }
 
-    .stage-title {
-        font-weight: 600;
-        color: #2c3e50;
-        font-size: 1.1em;
-    }
-
-    .back-button {
-        background: #3498db;
+    .number-box {
+        background-color: #3498db;
         color: white;
-        padding: 8px 20px;
-        border-radius: 6px;
-        text-decoration: none;
-        transition: background 0.3s;
-    }
-
-    /* Стили этапов */
-    .stage-selector {
-        display: flex;
-        gap: 15px;
-    }
-
-    .stage-dot {
         width: 40px;
         height: 40px;
-        border-radius: 8px;
-        background: #e0e0e0;
+        border-radius: 5px;
         display: flex;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .stage-dot.active {
-        background: #3498db;
-        color: white;
-        transform: scale(1.1);
-    }
-
-    /* Стили контента */
-    .content-block {
-        background: white;
-        padding: 20px;
-        border-radius: 12px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    }
-
-    .main-title {
-        text-align: center;
-        color: #2c3e50;
-        margin-bottom: 10px;
-    }
-
-    .sub-header {
-        text-align: center;
-        color: #7f8c8d;
-        margin-bottom: 25px;
-    }
-
-    /* Стили шкалы */
-    .rating-scale {
-        display: flex;
-        justify-content: center;
-        gap: 8px;
-        margin: 20px 0;
-    }
-
-    .number-btn {
-        width: 45px;
-        height: 45px;
-        border: none;
-        border-radius: 6px;
-        background: #3498db;
-        color: white;
+        font-size: 18px;
         font-weight: bold;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-
-    .number-btn:hover {
-        background: #2980b9;
-        transform: translateY(-2px);
-    }
-
-    /* Стили таблицы */
-    .criteria-table {
-        width: 100%;
-        margin: 25px 0;
-        border-collapse: collapse;
-    }
-
-    .criteria-table th {
-        background: #2c3e50;
-        color: white;
-        padding: 15px;
-        text-align: left;
-    }
-
-    .criteria-table td {
-        padding: 15px;
-        border-bottom: 1px solid #ecf0f1;
-    }
-
-    .score-select {
-        padding: 8px;
-        border: 2px solid #bdc3c7;
-        border-radius: 6px;
-        width: 70px;
-    }
-
-    /* Стили инструкций */
-    .instructions-section {
-        margin-top: 30px;
-        padding: 25px;
-        background: #f8f9fa;
-        border-radius: 12px;
-    }
-
-    .instructions-btn {
-        display: block;
-        margin: 20px auto;
-        padding: 10px 30px;
-        background: #95a5a6;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-    }
-
-    .top-btn {
-        display: block;
-        margin: 20px auto 0;
-        padding: 8px 20px;
-        background: #95a5a6;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-    }
-
-    /* Адаптивность */
-    @media (max-width: 768px) {
-        .rating-scale {
-            flex-wrap: wrap;
-        }
-
-        .number-btn {
-            width: 40px;
-            height: 40px;
-        }
-    }
-
-    .nav-button {
-        padding: 12px 30px;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .primary {
-        background: #27ae60;
-        color: white;
-        border: none;
-    }
-
-    .secondary {
-        background: #95a5a6;
-        color: white;
-        border: none;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
 </style>
-
 <script>
-    function scrollToInstructions() {
-        document.getElementById('instructions').scrollIntoView({
-            behavior: 'smooth'
+async function updateCriterionValue(criterionId, value) {
+    try {
+        const response = await fetch('/update_criterion_value', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                criterion_id: criterionId,
+                subj_value: parseFloat(value)  // Преобразуем значение в число
+            })
         });
-    }
 
-    function scrollToTop() {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
-        });
-    }
-
-    // Оригинальная функция updateCriterionValue остается без изменений
-    async function updateCriterionValue(criterionId, value) {
-        try {
-            const response = await fetch('/update_criterion_value', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    criterion_id: criterionId,
-                    subj_value: parseFloat(value)
-                })
-            });
-
-            if (response.ok) {
-                console.log('Value updated successfully');
-            }
-        } catch (error) {
-            console.error('Error:', error);
+        if (response.ok) {
+            console.log('Значение успешно обновлено');
+        } else {
+            console.error('Ошибка при обновлении значения');
         }
+    } catch (error) {
+        console.error('Ошибка:', error);
     }
+}
+
 </script>
 {% endblock %}
