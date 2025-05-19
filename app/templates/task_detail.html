@@ -60,7 +60,7 @@
                     <th>Best alternative</th>
                     <th>With value</th>
                     <th>
-                        <a href="#" id="toggle-all" class="toggle-link">Check all</a>
+                        <a href="#" id="toggle-all" class="toggle-link">Uncheck all</a>
                     </th>
                 </tr>
             </thead>
@@ -82,7 +82,7 @@
                         {% endif %}
                     </td>
                     <td>
-                        <input type="checkbox" class="analysis-checkbox" name="selected_analyses" value="{{ item.an.id }}">
+                        <input type="checkbox" class="analysis-checkbox" name="selected_analyses" value="{{ item.an.id }}" checked>
                     </td>
                 </tr>
                 {% endfor %}
@@ -385,7 +385,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const toggleAllLink = document.getElementById('toggle-all');
     const checkboxes = document.querySelectorAll('.analysis-checkbox');
-    let allChecked = false;
+    let allChecked = true;
 
     toggleAllLink.addEventListener('click', function(e) {
         e.preventDefault();
@@ -401,16 +401,12 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('DOMContentLoaded', function() {
     const summaryBtn = document.getElementById('summary-btn');
     const summaryResults = document.getElementById('summary-results');
-
-    summaryBtn.addEventListener('click', async function() {
-        const selectedAnalyses = Array.from(document.querySelectorAll('.analysis-checkbox:checked'))
-                                     .map(checkbox => checkbox.value);
-
+    const handleSummaryClick = async function() {
+        const selectedAnalyses = Array.from(document.querySelectorAll('.analysis-checkbox:checked')).map(checkbox => checkbox.value);
         if (selectedAnalyses.length === 0) {
             alert('Please, choose at least one analysis ');
             return;
         }
-
         try {
             // Показываем индикатор загрузки
             summaryBtn.disabled = true;
@@ -515,9 +511,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>`;
         } finally {
             summaryBtn.disabled = false;
-            summaryBtn.textContent = 'Сводный анализ';
+            summaryBtn.textContent = 'Summary analysis';
         }
-    });
+    }
+    summaryBtn.addEventListener('click', handleSummaryClick);
+    summaryBtn.click();
 });
 </script>
 {% endblock %}

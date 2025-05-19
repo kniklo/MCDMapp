@@ -55,8 +55,9 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        flash('Поздравляем, вы успешно зарегистрировались!')
-        return redirect(url_for('login'))
+        login_user(user)
+        session['selected_expert'] = user.id
+        return redirect(url_for('index'))
     return render_template('register.html', title='Регистрация', form=form)
 
 
@@ -127,6 +128,18 @@ def update_task(task_id):
     task.description = request.form.get('task_description')
     db.session.commit()
     return redirect(url_for('filltask_page'))
+
+@app.route('/delete_task/<int:task_id>')
+def delete_task(task_id):
+    task = Task.query.get_or_404(task_id)
+    try:
+        # Удаляем задачу из базы данных
+        db.session.delete(task)
+        db.session.commit()
+    except Exception as e:
+        db.session.rollback()
+        return redirect(url_for('index'))
+    return redirect(url_for('index'))
 
 @app.route('/change_task/<int:task_id>')
 def change_task(task_id):
@@ -297,7 +310,7 @@ def add_alt():
     new_taskalt = TaskAlternative(task_id=session.get('selected_task'), alternative_id=new_alt.id)
     db.session.add(new_taskalt)
     db.session.commit()
-    return jsonify({'success': True, 'id': new_alt.id})
+    return jsonify({'success': True, 'id': new_taskalt.id})
 
 @app.route('/filltask_page/delete_alt/<int:alt_id>', methods=['POST'])
 def delete_alt(alt_id):
@@ -335,7 +348,7 @@ def add_cr():
     new_taskcr = TaskCriterion(task_id=session.get('selected_task'), criterion_id=new_cr.id)
     db.session.add(new_taskcr)
     db.session.commit()
-    return jsonify({'success': True, 'id': new_cr.id})
+    return jsonify({'success': True, 'id': new_taskcr.id})
 
 @app.route('/filltask_page/delete_cr/<int:cr_id>', methods=['POST'])
 def delete_cr(cr_id):

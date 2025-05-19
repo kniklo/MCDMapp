@@ -65,61 +65,6 @@
             {% endfor %}
         </table>
     </div>
-    <form id="summary-form" method="POST" action="{{ url_for('task_summary', task_id=task.id) }}">
-    <div class="buttons-container">
-        <button type="button" id="summary-btn" class="summary-button">Сводный анализ</button>
-    </div>
-    <div id="summary-results" style="display: none;">
-        <div class="bottom-section">
-            <h1>Средние значения критериев</h1>
-            <table id="criterion_table" border="1">
-                <tr>
-                    <th>Criteria</th>
-                    <th>Importance</th>
-                </tr>
-                {% for cr in cr_cr %}
-                    <tr>
-                        <td>{{ cr.name }}</td>
-                        <td>
-                            <div class="progress-container">
-                                {% set colors = ['#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0', '#607D8B'] %}
-                                <div class="progress-bar avg-criteria"
-                                     data-criterion-id="{{ cr.id }}"
-                                     style="width: 0%; background-color: {{ colors[loop.index0 % colors|length] }};">
-                                    <span class="progress-value">0.00</span>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </table>
-        </div>
-        <div class="bottom-section">
-            <h1>Средние оценки альтернатив</h1>
-            <table id="alternative_table" border="1">
-                <tr>
-                    <th>Alternatives</th>
-                    <th>Rating</th>
-                </tr>
-                {% for alt in all_alt %}
-                    <tr>
-                        <td>{{ alt.name }}</td>
-                        <td>
-                            <div class="progress-container">
-                                {% set colors = ['#4CAF50', '#2196F3', '#FFC107', '#FF5722', '#9C27B0', '#607D8B'] %}
-                                <div class="progress-bar avg-alternative"
-                                     data-alternative-id="{{ alt.id }}"
-                                     style="width: 0%; background-color: {{ colors[loop.index0 % colors|length] }};">
-                                    <span class="progress-value">0.00</span>
-                                </div>
-                            </div>
-                        </td>
-                    </tr>
-                {% endfor %}
-            </table>
-        </div>
-    </div>
-</form>
     <div class="buttons-container">
         <form action="{{ url_for('index') }}" method="post">
             <button type="submit">Back to main</button>

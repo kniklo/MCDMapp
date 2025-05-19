@@ -88,12 +88,32 @@
         </table>
     </div>
     <div class="buttons-container">
+        <dialog id="deleteConfirmDialog" class="delete-dialog">
+        <div class="dialog-content">
+            <img src="{{ url_for('static', filename='tyan9-delete.png') }}" alt="Подтверждение удаления" class="dialog-image">
+            <p id="deleteConfirmMessage" class="dialog-message">Удалить <span id="itemName"></span>?</p>
+            <div class="dialog-buttons">
+                <button id="confirmDeleteYes" class="dialog-button yes-button">Да</button>
+                <button id="confirmDeleteNo" class="dialog-button no-button">Нет</button>
+            </div>
+        </div>
+    </dialog>
+        <dialog id="errorDialog" class="error-dialog">
+            <div class="dialog-content">
+                <img src="{{ url_for('static', filename='tyan1_wtp.png') }}" alt="Ошибка" class="error-image">
+                <p id="errorMessage" class="error-message"></p>
+                <button id="errorOkButton" class="error-ok-button">OK</button>
+            </div>
+        </dialog>
         <dialog id="confirmDialog">
-            <p class="dialog-message">Вы уверены?<br>
+            <div class="dialog-content">
+                <img src="{{ url_for('static', filename='tyan5-attention.png') }}" alt="Предупреждение" class="error-image">
+                <p class="dialog-message">Вы уверены?<br>
                 После записи наборы альтернатив и критериев нельзя будет изменить.</p>
-            <div class="dialog_buttons">
-                <button id="confirmYes" class="dialog_button">Да</button>
-                <button id="confirmNo" class="dialog_button">Нет</button>
+                <div class="buttons-container">
+                    <button id="confirmYes" class="dialog_button">Да</button>
+                    <button id="confirmNo" class="dialog_button">Нет</button>
+                </div>
             </div>
         </dialog>
         <button id="leaveButton" type="button">Записать</button>
@@ -169,6 +189,122 @@
 .inline-form {
     display: inline;
 }
+.error-dialog {
+    border: none;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 400px;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+
+.error-dialog::backdrop {
+    background-color: rgba(0,0,0,0.5);
+}
+
+.dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.error-image {
+    width: 300px;
+    height: auto;
+    border-radius: 4px;
+}
+
+.error-message {
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+    text-align: center;
+}
+
+.error-ok-button {
+    padding: 8px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
+}
+
+.error-ok-button:hover {
+    background-color: #45a049;
+}
+    .delete-dialog {
+    border: none;
+    border-radius: 8px;
+    padding: 20px;
+    max-width: 400px;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 0 0 20px rgba(0,0,0,0.2);
+}
+
+.delete-dialog::backdrop {
+    background-color: rgba(0,0,0,0.5);
+}
+
+.dialog-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.dialog-image {
+    width: 150px;
+    height: auto;
+    border-radius: 4px;
+}
+
+.dialog-message {
+    font-size: 16px;
+    color: #333;
+    margin: 0;
+    text-align: center;
+}
+
+.dialog-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    width: 100%;
+}
+
+.dialog-button {
+    padding: 8px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.3s;
+    min-width: 80px;
+}
+
+.yes-button {
+    background-color: #dc3545;
+    color: white;
+}
+
+.yes-button:hover {
+    background-color: #c82333;
+}
+
+.no-button {
+    background-color: #6c757d;
+    color: white;
+}
+
+.no-button:hover {
+    background-color: #5a6268;
+}
 </style>
 
 <script>
@@ -180,13 +316,84 @@ function escapeHtml(text) {
                .replace(/"/g, "&quot;")
                .replace(/'/g, "&#039;");
 }
+function showError(message) {
+    errorMessage.textContent = message;
+    errorDialog.showModal();
+}
+function showDeleteConfirm(itemName, form) {
+    itemNameSpan.textContent = itemName;
+    currentForm = form;
+    deleteConfirmDialog.showModal();
+}
 
+const errorDialog = document.getElementById('errorDialog');
+const errorMessage = document.getElementById('errorMessage');
+const errorOkButton = document.getElementById('errorOkButton');
 const dialog = document.getElementById('confirmDialog');
 const leaveButton = document.getElementById('leaveButton');
 const confirmYes = document.getElementById('confirmYes');
 const confirmNo = document.getElementById('confirmNo');
+const deleteConfirmDialog = document.getElementById('deleteConfirmDialog');
+const deleteConfirmMessage = document.getElementById('deleteConfirmMessage');
+const itemNameSpan = document.getElementById('itemName');
+const confirmDeleteYes = document.getElementById('confirmDeleteYes');
+const confirmDeleteNo = document.getElementById('confirmDeleteNo');
+
+let currentForm = null;
+
+confirmDeleteYes.addEventListener('click', function() {
+    deleteConfirmDialog.close();
+    if (currentForm) {
+        currentForm.submit();
+    }
+});
+
+confirmDeleteNo.addEventListener('click', function() {
+    deleteConfirmDialog.close();
+    currentForm = null;
+});
+
+deleteConfirmDialog.addEventListener('cancel', function(e) {
+    e.preventDefault();
+    currentForm = null;
+});
+
+
+errorOkButton.addEventListener('click', function() {
+    errorDialog.close();
+});
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('.inline-form').forEach(form => {
+        const button = form.querySelector('button[type="submit"]');
+        const itemName = button.getAttribute('onclick').match(/Удалить (.*?)\?/)[1];
+
+        // Удаляем стандартный confirm
+        button.removeAttribute('onclick');
+
+        // Добавляем новый обработчик
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            showDeleteConfirm(itemName, form);
+        });
+    });
+});
 
 leaveButton.addEventListener('click', function(e) {
+// Получаем количество альтернатив и критериев
+    const altCount = document.querySelectorAll('#alternatives_table tbody tr').length;
+    const crCount = document.querySelectorAll('#criterion_table tbody tr').length;
+
+    if (altCount < 2 && crCount < 2) {
+        showError('Добавьте минимум 2 альтернативы и 2 критерия для анализа');
+        return;
+    } else if (altCount < 2) {
+        showError('Добавьте минимум 2 альтернативы для анализа');
+        return;
+    } else if (crCount < 2) {
+        showError('Добавьте минимум 2 критерия для анализа');
+        return;
+    }
     dialog.showModal();
 });
 
@@ -260,7 +467,10 @@ function setupHandlers(type) {
         button.type = 'submit';
         button.className = 'btn btn-danger';
         button.textContent = 'Удалить';
-        button.onclick = () => confirm(`Удалить ${escapeHtml(name)}?`);
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            showDeleteConfirm(name, form);
+        });
 
         form.appendChild(button);
         actionCell.appendChild(form);
