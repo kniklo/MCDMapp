@@ -1,0 +1,370 @@
+/*правлю логин и регистрацию*/
+/*кнопки стилизованные (на стр логина и регистрации)*/
+.styled-button {
+    background: white;
+    padding: 8px 20px;
+    border: 1px solid rgba(255, 255, 255, 255);
+    border-color: #2c3e50;
+    border-radius: 2px;
+    /*box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);*/
+    font-family: 'Favorit', sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    color: #2c3e50;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    white-space: nowrap;
+}
+.styled-button:hover {
+    color: #00aa7b;
+    border-color: #00aa7b;
+    transform: translateY(-1px);
+}
+
+
+/* правлю task.html*/
+/* кнопки логин-регистрация Для неавторизованных - центрированные */
+.top-center-auth {
+    position: absolute;
+    top: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: white;
+    padding: 12px 40px;
+    border: 1px solid #e0e0e0;
+    border-radius: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    z-index: 100;
+    white-space: nowrap;
+    font-family: 'Favorit', sans-serif; /* Явно указываем шрифт */
+    font-weight: 400; /* Regular */
+    font-size: 15px;
+    backdrop-filter: blur(5px); /* Лёгкое размытие фона */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Светлая граница */
+}
+.top-center-auth a {
+    color: #2c3e50; /* Тёмно-синий вместо яркого */
+    text-decoration: none;
+    margin: 0 25px;
+    padding: 8px 0;
+    position: relative;
+    transition: all 0.3s ease;
+    font-weight: 500; /* Medium для ссылок */
+}
+.top-center-auth a:hover {
+    color: #00aa7b; /* Цвет вашего акцента */
+    text-decoration: none;
+}
+/* Подчёркивание при наведении */
+.top-center-auth a::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #00aa7b;
+    transition: width 0.3s ease;
+}
+.top-center-auth a:hover::after {
+    width: 100%;
+}
+/* картинка по центру*/
+.auth-background {
+    position: relative;
+    min-height: 100vh;
+    background: url('/static/images/index.png') no-repeat calc(50% - 25px) center fixed;
+    background-size: cover;
+    background-color: #f5f5f5; /* fallback */
+}
+.auth-background::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background:
+    /* Градиентный оверлей */
+    linear-gradient(135deg, rgba(201, 191, 181, 0.9) 0%, rgba(123, 86, 131, 0.85) 100%),
+    /* Текстура шума */
+    url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="400" height="400" viewBox="0 0 400 400"><filter id="noise"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" stitchTiles="stitch"/></filter><rect width="400" height="400" filter="url(%23noise)" opacity="0.15"/></svg>');
+    background-size: cover, cover, auto;
+    z-index: -1;
+    opacity: 0.8;
+}
+/* Классы для акцентного шрифта */
+.font-accent {
+    font-family: 'GT Super Display', serif;
+    font-weight: 300 !important;
+}
+/* Классы для Favorit */
+.font-light {
+    font-weight: 300 !important;
+}
+.font-medium {
+    font-weight: 500 !important;
+}
+.font-regular {
+    font-weight: 400 !important;
+}
+
+
+
+
+/* перенесла из base */
+.container {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 20px;
+    background: white;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    width: 50%;
+    max-width: 800px;
+    min-width: 300px;
+    margin-top: 40px; /* Оставляем место для auth-section */
+}
+
+.auth-section {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: white;
+    padding: 8px 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    z-index: 100;
+}
+.auth-section p, .auth-section div {
+    margin: 0;
+    font-size: 0.9em;
+}
+/* было .auth-section a {
+    color: #0066cc;
+    text-decoration: none;
+    margin: 0 5px;
+}
+
+.auth-section a:hover {
+    text-decoration: underline;
+}*/
+
+.auth-section a {
+    color: #2c3e50;
+    text-decoration: none;
+    margin: 0 5px;
+    padding: 8px 0;
+    position: relative;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+.auth-section a:hover {
+    color: #00aa7b;
+    text-decoration: none;
+}
+.auth-section a::after {
+    content: '';
+    position: absolute;
+    bottom: 4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #00aa7b;
+    transition: width 0.3s ease;
+}
+.auth-section a:hover::after {
+    width: 100%;
+}
+
+
+.top-section, .bottom-section {
+    padding: 10px;
+}
+
+.top-section {
+    border-bottom: none; /* или */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+ul {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+.buttons-container {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.buttons-container button {
+    padding: 10px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #00aa7b;
+    color: white;
+}
+input[type="text"],
+input[type="password"],
+input[type="email"] {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.flash-messages {
+        margin: 10px 0;
+        padding: 10px;
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+}
+/* перенесла из base */
+
+
+
+
+/* Стили для заголовков */
+h1, h2 {
+    color: #333;
+}
+
+/* Стили для таблиц */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+}
+
+table, th, td {
+    border: 1px solid #ddd;
+}
+
+th, td {
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr.dragging {
+            opacity: 0.5;
+        }
+
+.drop-zone {
+            border-top: 2px solid #007bff; /* Синяя линия для обозначения зоны вставки */
+        }
+/* Стили для форм */
+form {
+    margin-bottom: 20px;
+}
+
+input[type="text"], input[type="number"] {
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Стили для кнопки "Delete" */
+button[type="submit"] {
+    background-color: #dc3545;
+}
+
+button[type="submit"]:hover {
+    background-color: #c82333;
+}
+
+#suggestions {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    max-height: 200px;
+    overflow-y: auto;
+    width: 100%;
+    z-index: 1000;
+}
+
+.suggestion {
+    padding: 5px;
+    cursor: pointer;
+}
+
+.suggestion:hover {
+    background: #f2f2f2;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+}
+
+.disabled-form {
+    pointer-events: none;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.disabled-text {
+    color: #999;
+}
+
+dialog::backdrop {
+ background-color: rgba(0, 0, 0, 0.5);
+}
+
+dialog {
+ width: 300px;
+ padding: 20px;
+ border-radius: 5px;
+ background-color: white;
+}
+
+.dialog-message {
+ text-align: center;
+ margin-bottom: 20px;
+}
+
+.dialog_buttons {
+ display: flex;
+ justify-content: space-between;
+ margin-top: 20px;
+}
+
+.dialog_button {
+ padding: 10px 20px;
+ border: none;
+ border-radius: 3px;
+ cursor: pointer;
+}
+
+#confirmYes {
+ background-color: #28a745;
+ color: white;
+}
+
+#confirmNo {
+ background-color: #dc3545;
+ color: white;
+}
+
+.selectedrow_intable {
+        background-color: #d3d3f3; /* Серый цвет фона */
+    }

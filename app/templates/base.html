@@ -1,110 +1,37 @@
-<!Doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
     <head>
         {% if title %}
         <title>{{ title }} - DmApp</title>
         {% else %}
         <title>DmApp</title>
         {% endif %}
-        <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+
+        <!-- Для важных элементов добавьте предзагрузку шрифтов -->
+        <link rel="preload" href="{{ url_for('static', filename='fonts/Favorit-Regular.woff2') }}" as="font" type="font/woff2" crossorigin>
+
+        <!-- Подключаем шрифты ПЕРЕД основными стилями -->
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/fonts.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+
+        <!-- Переносим все стили в styles_prev.css, оставляем только критически важные inline-стили -->
         <style>
             body {
-        display: flex;
-        justify-content: flex-start;
-        align-items: center;
-        min-height: 100vh;
-        margin: 0;
-        padding: 20px; /* Добавляем отступ для body */
-        box-sizing: border-box;
-        position: relative; /* Делаем body точкой отсчета для абсолютного позиционирования */
-    }
+                display: flex;
+                justify-content: flex-start;
+                align-items: center;
+                min-height: 100vh;
+                margin: 0;
+                padding: 20px; /* Добавляем отступ для body */
+                box-sizing: border-box;
+                position: relative; /* Делаем body точкой отсчета для абсолютного позиционирования */
 
-    .container {
-        border: 1px solid #ccc;
-        border-radius: 10px;
-        padding: 20px;
-        background: white;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
-        width: 50%;
-        max-width: 800px;
-        min-width: 300px;
-        margin-top: 40px; /* Оставляем место для auth-section */
-    }
-
-    .auth-section {
-        position: absolute;
-        top: 20px;
-        right: 20px;
-        background: white;
-        padding: 8px 15px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        z-index: 100;
-    }
-
-    .auth-section p, .auth-section div {
-        margin: 0;
-        font-size: 0.9em;
-    }
-
-    .auth-section a {
-        color: #0066cc;
-        text-decoration: none;
-        margin: 0 5px;
-    }
-
-    .auth-section a:hover {
-        text-decoration: underline;
-    }
-
-    .top-section, .bottom-section {
-        padding: 10px;
-    }
-
-    .top-section {
-        border-bottom: 1px solid #ccc;
-        margin-bottom: 20px;
-        text-align: center;
-    }
-
-    ul {
-        list-style-type: disc;
-        padding-left: 20px;
-    }
-
-    .buttons-container {
-        display: flex;
-        gap: 10px;
-        margin-top: 20px;
-    }
-
-        .buttons-container button {
-            padding: 10px 20px;
-            font-size: 16px;
-            border: none;
-            border-radius: 5px;
-            background-color: #00aa7b;
-            color: white;
-        }
-        input[type="text"],
-        input[type="password"],
-        input[type="email"] {
-            width: 100%;
-            padding: 8px;
-            box-sizing: border-box;
-        }
-        .flash-messages {
-                margin: 10px 0;
-                padding: 10px;
-                background-color: #f8d7da;
-                color: #721c24;
-                border: 1px solid #f5c6cb;
-                border-radius: 4px;
+                font-family: 'Favorit', sans-serif; /* Добавляем основной шрифт */
+                font-weight: 400; /* Regular по умолчанию */
             }
-    </style>
+        </style>
     </head>
-    <body>
+    <body class="{% if not current_user.is_authenticated %}auth-background{% endif %}">
         <hr>
         {% with messages = get_flashed_messages() %}
             {% if messages %}
@@ -115,9 +42,17 @@
             </div>
             {% endif %}
         {% endwith %}
+
+
+        {% if show_centered_content and not current_user.is_authenticated %}
+            <div class="top-center-auth">
+                {% block centered_content %}{% endblock %}
+            </div>
+        {% endif %}
+
+
         {% block content %}{% endblock %}
         <hr>
         {% block additional_content %}{% endblock %}
-
-  </body>
+    </body>
 </html>

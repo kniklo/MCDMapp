@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container">
-    <h1>Вход в систему</h1>
+    <h1>Login</h1>
     <form action="{{ url_for('login') }}" method="post" novalidate>
         {{ form.hidden_tag() }}
         <p>
@@ -20,8 +20,8 @@
             {% endfor %}
         </p>
         <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
-        <p>{{ form.submit() }}</p>
+        <p>{{ form.submit(class_="styled-button") }}</p>
     </form>
-    <p>Новый пользователь? <a href="{{ url_for('register') }}">Зарегистрируйтесь!</a></p>
+    <p>New user? <a href="{{ url_for('register') }}">Register here!</a></p>
 </div>
 {% endblock %}

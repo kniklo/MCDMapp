@@ -1,0 +1,48 @@
+/* отдельный файл для подключения шрифтов */
+
+/* font-weight в @font-face — должен точно соответствовать толщине шрифта в файле: */
+/* 500 - Medium */
+/* 400 - Regular */
+/* 300 - Light */
+
+/* font-style: normal — всегда указывать, даже если шрифт не курсивный */
+
+/* font-display: swap; Важно! Не даёт тексту "пропадать" при загрузке*/
+
+/* GT Super Display (акцентные шрифты) */
+@font-face{
+    font-family: 'GT Super Display';
+    src: url('../fonts/GT-Super-Display-Light.woff2') format('woff2'),
+         url('../fonts/GT-Super-Display-Light.woff') format('woff');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* Favorit (основной шрифт) */
+@font-face {
+  font-family: 'Favorit';
+  src: url('../fonts/Favorit-Light.woff2') format('woff2'),
+       url('../fonts/Favorit-Light.woff') format('woff');
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Favorit';
+  src: url('../fonts/Favorit-Regular.woff2') format('woff2'),
+       url('../fonts/Favorit-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Favorit';
+  src: url('../fonts/Favorit-Medium.woff2') format('woff2'),
+       url('../fonts/Favorit-Medium.woff') format('woff');
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}

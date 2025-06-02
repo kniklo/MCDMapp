@@ -5,44 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="74bdc243-5ef0-4c52-8654-5de9457a93f2" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/mcdmApp.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/mcdmApp.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/static/css/fonts.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/static/css/styles.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/static/css/styles_prev.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/static/fonts/Favorit-Light.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/static/fonts/Favorit-Light.woff2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/static/fonts/Favorit-Medium.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/static/fonts/Favorit-Medium.woff2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/static/fonts/Favorit-Regular.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/static/fonts/Favorit-Regular.woff2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/static/fonts/GT-Super-Display-Light.woff" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/static/fonts/GT-Super-Display-Light.woff2" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/static/images/index.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/forms.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/forms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/routes.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/base_mcdm.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/base_mcdm.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/methods/ahp.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/methods/ahp.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/methods/fuzzy_ahp.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/methods/fuzzy_ahp.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/services/utils/matrices.py" beforeDir="false" afterPath="$PROJECT_DIR$/app/services/utils/matrices.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/static/analyis_style.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/static/images/tip1criteria.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/static/styles.css" beforeDir="false" afterPath="$PROJECT_DIR$/app/static/styles.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/alternative.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/alternative_evaluation.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/alternative_evaluation.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/alternative_evaluation1.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/static/index.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/static/styles.css" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/app/templates/base.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/base.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/comparison_matrix.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/comparison_matrix.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/criterion.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/criterion.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/expert.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/expert.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/filltask.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/filltask.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/templates/login.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/login.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/templates/register.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/register.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/results.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/results.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/app/templates/task.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/task.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/templates/task_detail.html" beforeDir="false" afterPath="$PROJECT_DIR$/app/templates/task_detail.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/bd.sql" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/chema.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/chema_new.jpg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/config.py" beforeDir="false" afterPath="$PROJECT_DIR$/config.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/dmapp.py" beforeDir="false" afterPath="$PROJECT_DIR$/dmapp.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/temp.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/полная.excalidraw" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -52,22 +34,33 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 8
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 8
+}</component>
   <component name="ProjectId" id="2x4kMwcycEQ6EN0IUds5qXQXZ55" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Python.dmapp.executor": "Run",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "git-widget-placeholder": "master"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ASKED_ADD_EXTERNAL_FILES&quot;: &quot;true&quot;,
+    &quot;Python.dmapp.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;master&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Kate\ХНУРЄ\Bachelor work\App\mcdmApp\app\static\images" />
+      <recent name="C:\Kate\ХНУРЄ\Bachelor work\App\mcdmApp\app\static\css" />
+      <recent name="C:\Kate\ХНУРЄ\Bachelor work\App\mcdmApp\app\static" />
+    </key>
+  </component>
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
@@ -85,5 +78,8 @@
       <updated>1747204689713</updated>
     </task>
     <servers />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
 </project>

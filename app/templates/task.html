@@ -1,26 +1,20 @@
 {% extends "base.html" %}
 
-{% block content %}
-{% if not current_user.is_authenticated %}
-<style>
-    body {
-        background: url('/static/index.png') no-repeat center center fixed;
-        background-size: cover;
-    }
-    .container {
-        background-color: rgba(255, 255, 255, 0.85);
-    }
-</style>
-{% endif %}
+{% set show_centered_content = True %}
+{% block centered_content %}
+<a class="link-hover" href="{{ url_for('login') }}">Login</a> | <a class="link-hover" href="{{ url_for('register') }}">Register</a>
+{% endblock %}
 
+{% block content %}
+
+{% if current_user.is_authenticated %}
 <!-- Блок авторизации -->
 <div class="auth-section">
     {% if current_user.is_authenticated %}
-        <p>You are logged in: {{ current_user.username }} | <a href="{{ url_for('logout') }}">Logoff</a></p>
-    {% else %}
-        <a href="{{ url_for('login') }}">Login</a> | <a href="{{ url_for('register') }}">Register</a>
+        <p>You are logged in: {{ current_user.username }} | <a class="link-hover" href="{{ url_for('logout') }}">Logoff</a></p>
     {% endif %}
 </div>
+{% endif %}
 
 {% if current_user.is_authenticated %}
 <div class="container">
