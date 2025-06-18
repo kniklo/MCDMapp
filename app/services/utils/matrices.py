@@ -16,7 +16,6 @@ class MatrixHelper:
         for i in range(size):
             for j in range(size):
                 if i != j:
-                    # matrix[i][j] = round(importances[i] / importances[j], 2)
                     matrix[i][j] = round(np.power(base, importances[i]) / np.power(base, importances[j]), 2)
 
         return matrix.tolist()
@@ -62,6 +61,10 @@ class MatrixHelper:
 
         # Индекс согласованности
         CI = (max_eigenvalue - n) / (n - 1)
+
+        # Обнуляем CI, если он получился отрицательным из-за численной погрешности
+        if CI < 0:
+            CI = 0.0
 
         # Случайный индекс (RI)
         RI_TABLE = {3: 0.58, 4: 0.9, 5: 1.12, 6: 1.24, 7: 1.32,

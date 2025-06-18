@@ -149,7 +149,7 @@ class Task(db.Model):
     __tablename__ = 'task'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String(65), nullable=False)
-    description = db.Column(db.String(95), nullable=True)
+    description = db.Column(db.Text, nullable=True)
     fl_new = db.Column(db.Integer, nullable=False, default=1)
     owner = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
     create_date = db.Column(db.DateTime, nullable=False)

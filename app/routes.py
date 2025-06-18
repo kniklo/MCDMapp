@@ -39,11 +39,13 @@ def login():
         return redirect(next_page)
     return render_template('login.html', title='Вход', form=form)
 
+
 @app.route('/logout')
 def logout():
     session.pop('selected_expert', None)
     logout_user()
     return redirect(url_for('index'))
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -115,6 +117,7 @@ def index():
         current_user=current_user
     )
 
+
 @app.route('/fill_task/<int:task_id>')
 def fill_task(task_id):
     session['selected_task'] = task_id
@@ -129,6 +132,7 @@ def update_task(task_id):
     db.session.commit()
     return redirect(url_for('filltask_page'))
 
+
 @app.route('/delete_task/<int:task_id>')
 def delete_task(task_id):
     task = Task.query.get_or_404(task_id)
@@ -141,10 +145,12 @@ def delete_task(task_id):
         return redirect(url_for('index'))
     return redirect(url_for('index'))
 
+
 @app.route('/change_task/<int:task_id>')
 def change_task(task_id):
     Task.update_fl_new_by_id(session.get('selected_task'), 1)
     return redirect(url_for('filltask_page'))
+
 
 @app.route('/analyze_task/<int:task_id>', methods=['GET', 'POST'])
 def analyze_task(task_id):

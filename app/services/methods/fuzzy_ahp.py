@@ -4,8 +4,6 @@ from app.models import db, AnalysisCriterion, AlternativeEvaluation, AnalysisAlt
 from typing import List, Tuple
 from ..base_mcdm import MCDMMethod
 from ..utils.matrices import MatrixHelper
-# from services.base_mcdm import MCDMMethod
-# from services.utils.matrices import MatrixHelper
 
 
 class TriangularFuzzyNumber:
@@ -16,19 +14,54 @@ class TriangularFuzzyNumber:
         self.m = m  # Основное значение
         self.u = u  # Верхняя граница
 
+    # @classmethod
+    # def from_crisp(cls, value: float, variation: float = 0.2):
+    #     """Создаёт TFN из чёткого значения с вариацией"""
+    #     delta = value * variation
+    #     return cls(
+    #         l=max(1 / 9, value - delta),
+    #         m=value,
+    #         u=min(9, value + delta)
+    #     )
+    ##################
+    _PREDEFINED_TFN = {
+        1: (1, 1, 1),
+        2: (0.5, 1, 1.5),
+        3: (1, 1.5, 2),
+        4: (1.5, 2, 2.5),
+        5: (2, 2.5, 3),
+        6: (2.5, 3, 3.5),
+        7: (3, 3.5, 4),
+        8: (3.5, 4, 4.5),
+        9: (4, 4.5, 5),
+        0.5: (0.666667, 1, 1),
+        0.333333: (0.5, 0.666667, 0.666667),
+        0.25: (0.4, 0.5, 0.666667),
+        0.2: (0.333333, 0.4, 0.5),
+        0.166667: (0.285714, 0.333333, 0.4),
+        0.142857: (0.25, 0.285714, 0.333333),
+        0.125: (0.222222, 0.25, 0.285714),
+        0.111111: (0.222222, 0.222222, 0.25),
+    }
+
     @classmethod
-    def from_crisp(cls, value: float, variation: float = 0.2):
-        """Создаёт TFN из чёткого значения с вариацией"""
-        delta = value * variation
-        return cls(
-            l=max(1 / 9, value - delta),
-            m=value,
-            u=min(9, value + delta)
-        )
+    def from_crisp(cls, value: float):
+        """Создаёт TFN по предопределённой таблице"""
+        if value in cls._PREDEFINED_TFN:
+            l, m, u = cls._PREDEFINED_TFN[value]
+        else:
+            # Логика для промежуточных значений
+            closest = min(cls._PREDEFINED_TFN.keys(), key=lambda x: abs(x - value))
+            l, m, u = cls._PREDEFINED_TFN[closest]
+        return cls(l, m, u)
+    ##################
 
     def defuzzify(self) -> float:
         """Дефаззификация методом центра тяжести"""
         return (self.l + 2 * self.m + self.u) / 4
+    # def defuzzify(self) -> float:
+    #     """Дефаззификация centroid method, также известный как метод среднего значения"""
+    #     return (self.l + self.m + self.u) / 3
 
 
 class FuzzyAHP(MCDMMethod):
@@ -44,6 +77,7 @@ class FuzzyAHP(MCDMMethod):
         # 3. Рассчитываем и сохраняем веса критериев
         criteria_weights = self._calculate_weights(fuzzy_matrix)
         self._save_weights(analysis_id, criteria_weights, is_criteria=True)
+
 
         # 4. Обрабатываем альтернативы
         criteria = AnalysisCriterion.query.filter_by(analysis_id=analysis_id).all()
