@@ -36,3 +36,13 @@ workspace.xml
 # Environment files
 .env
 .env.*
+
+# Compiled HTML / CSS cache (Jinja2)
+*.html.pyc
+*.jinja2.pyc
+
+# pytest cache
+.pytest_cache/
+
+# MySQL dumps
+*.sql
