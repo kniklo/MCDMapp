@@ -9,6 +9,7 @@ class Config:
     DB_PASSWORD = os.environ.get('DB_PASSWORD', '12345678')
     DB_HOST = os.environ.get('DB_HOST', 'localhost')
     DB_NAME = os.environ.get('DB_NAME', 'mcdmapp')
+
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
         f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_HOST}/{DB_NAME}"
     SQLALCHEMY_TRACK_MODIFICATIONS = False
