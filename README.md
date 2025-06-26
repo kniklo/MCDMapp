@@ -1,6 +1,6 @@
 # 🧠 MCDM Decision Support System (FAHP-based)
 
-A Flask-based decision support system (DSS) implementing the **Fuzzy Analytic Hierarchy Process (FAHP)** for evaluating alternatives (e.g., cosmetic products).  
+A Flask-based decision support system (DSS) implementing the **Fuzzy Analytic Hierarchy Process (FAHP)** for evaluating alternatives (e.g., products).  
 Users can define criteria and alternatives, enter expert judgments, and receive automated analysis results.
 
 ---
